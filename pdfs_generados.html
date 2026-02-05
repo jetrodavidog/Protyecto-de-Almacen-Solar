@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA ALMACÉN SOLAR | Historial de Vales</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #ff9800;
+            --primary-hover: #e68a00;
+            --danger: #ef4444;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-muted: #94a3b8;
+        }
+
+        * { box-sizing: border-box; transition: all 0.2s ease; }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.96)),
+                        url('fondo_fotovoltaico.png') center/cover fixed;
+            color: white; min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* =========================================
+           CORRECCIÓN: SIDEBAR COMPLETO (IDÉNTICO AL ORIGINAL)
+        ========================================= */
+        .sidebar { 
+            position: fixed; 
+            top: 0;
+            left: -280px; 
+            width: 280px; 
+            height: 100vh; /* Abarca toda la altura completa */
+            background: #0b1224; 
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 2000; 
+            box-shadow: 15px 0 40px rgba(0,0,0,0.7); 
+            border-right: 1px solid rgba(255,152,0,0.1); 
+        }
+        .sidebar.active { left: 0; }
+        .sidebar-header { 
+            padding: 40px 25px; 
+            font-weight: 900; 
+            font-size: 24px; 
+            color: var(--primary); 
+            letter-spacing: -1px; 
+            font-family: 'Outfit', sans-serif;
+        }
+        .sidebar nav a { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            color: #94a3b8; 
+            text-decoration: none; 
+            padding: 18px 25px; 
+            transition: 0.3s; 
+            font-family: 'Outfit', sans-serif;
+        }
+        .sidebar nav a:hover, .sidebar nav a.active { 
+            background: rgba(255,152,0,0.1); 
+            color: white; 
+            border-left: 4px solid var(--primary); 
+        }
+
+        .menu-btn { 
+            position: fixed; 
+            top: 20px; 
+            left: 20px; 
+            background: var(--primary); 
+            border: none; 
+            border-radius: 15px; 
+            padding: 14px; 
+            cursor: pointer; 
+            z-index: 1500; 
+            color: white; 
+            box-shadow: 0 8px 20px rgba(255,152,0,0.3); 
+            display: flex;
+        }
+
+        .overlay { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.75); 
+            backdrop-filter: blur(5px); 
+            display: none; 
+            z-index: 1000; 
+        }
+        .overlay.active { display: block; }
+
+        /* =========================================
+           RESTO DEL CÓDIGO (SIN TOCAR LÓGICA)
+        ========================================= */
+        .main-content { max-width: 1200px; margin: 100px auto 50px; padding: 0 20px; }
+        .glass-panel {
+            background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: 30px; padding: 40px; backdrop-filter: blur(15px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; flex-wrap: wrap; gap: 20px; }
+        .header-flex h1 { font-family: 'Outfit'; font-size: 36px; margin: 0; letter-spacing: -1px; }
+        .controls { display: flex; gap: 15px; flex-wrap: wrap; align-items: center; }
+        .search-box { position: relative; max-width: 350px; }
+        .search-box i { position: absolute; left: 15px; top: 12px; color: var(--text-muted); }
+        .search-box input {
+            background: rgba(15, 23, 42, 0.6); border: 1px solid var(--glass-border);
+            padding: 12px 15px 12px 45px; border-radius: 12px; color: white; width: 100%; outline: none;
+        }
+        .search-box input:focus { border-color: var(--primary); }
+        .btn-danger-outline {
+            background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 12px 20px; border-radius: 12px; cursor: pointer; font-weight: 600;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .btn-danger-outline:hover { background: var(--danger); color: white; }
+        .table-wrapper { margin-top: 20px; border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: rgba(255,255,255,0.05); padding: 18px; text-align: left; font-size: 12px; color: var(--text-muted); text-transform: uppercase; }
+        td { padding: 18px; border-bottom: 1px solid var(--glass-border); font-size: 14px; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+        .folio-badge { background: rgba(255, 152, 0, 0.15); color: var(--primary); padding: 6px 12px; border-radius: 8px; font-family: monospace; font-weight: 800; font-size: 14px; }
+        .btn-circle { width: 40px; height: 40px; border-radius: 50%; border: none; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; margin-left: 5px; }
+        .btn-view { background: rgba(0, 229, 255, 0.1); color: #00e5ff; }
+        .btn-view:hover { background: #00e5ff; color: #000; }
+        .btn-del { background: rgba(239, 68, 68, 0.1); color: #f87171; }
+        .btn-del:hover { background: #ef4444; color: #fff; }
+
+        #pdfPrintView { display: none; }
+        @media print {
+            @page { size: A4; margin: 0; }
+            body { background: white !important; }
+            .main-content, .menu-btn, .sidebar, .overlay { display: none !important; }
+            #pdfPrintView { display: block !important; }
+            .page { width: 210mm; min-height: 297mm; background: white; color: #1e293b; position: relative; display: flex; flex-direction: column; }
+            .img-header { width: 100%; }
+            .img-footer { width: 100%; margin-top: auto; }
+            .pdf-inner { padding: 10mm 18mm 25mm 18mm; flex-grow: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="menu-btn" onclick="toggleSidebar()"><i class="material-icons-round">menu</i></button>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">SOLAR CONTROL</div>
+        <nav>
+            <a href="index.html"><i class="material-icons-round">dashboard</i> Inventario Real</a>
+            <a href="recepcion_ia.html"><i class="material-icons-round">receipt_long</i> Recepción XML</a>
+            <a href="generador_pdf.html"><i class="material-icons-round">local_shipping</i> Vales de Salida</a>
+            <a href="pdfs_generados.html" class="active"><i class="material-icons-round">history</i> Historial Log</a>
+        </nav>
+    </aside>
+
+    <div class="main-content">
+        <div class="glass-panel">
+            <div class="header-flex">
+                <div>
+                    <h1>Historial de Vales</h1>
+                    <p style="color:var(--text-muted); margin:5px 0 0;">Gestión de documentos de salida emitidos</p>
+                </div>
+                <div class="controls">
+                    <div class="search-box">
+                        <i class="material-icons-round">search</i>
+                        <input type="text" id="searchInput" placeholder="Buscar por folio o proyecto..." onkeyup="filtrar()">
+                    </div>
+                    <button class="btn-danger-outline" onclick="borrarTodo()">
+                        <i class="material-icons-round">delete_sweep</i> Limpiar Todo
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Folio</th>
+                            <th>Proyecto / Obra</th>
+                            <th>Fecha de Registro</th>
+                            <th style="text-align: right;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historialBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="pdfPrintView">
+        <div class="page">
+            <img src="SUPERIOR.png" class="img-header">
+            <div class="pdf-inner">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                    <img src="logo.png" style="height:120px;">
+                    <div style="text-align:right">
+                        <h2 style="margin:0; font-family:'Outfit'; font-size:32px;">VALE DE SALIDA</h2>
+                        <span id="p-folio" style="font-weight:900; color:var(--primary); font-size:18px;"></span>
+                    </div>
+                </div>
+                <div style="display:grid; grid-template-columns: repeat(4, 1fr); background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; margin-bottom:25px;">
+                    <div style="padding:12px; border-right:1px solid #e2e8f0;">
+                        <b style="font-size:9px; color:var(--primary); display:block;">PROYECTO</b>
+                        <span id="p-obra" style="font-size:11px; font-weight:700;"></span>
+                    </div>
+                    <div style="padding:12px; border-right:1px solid #e2e8f0;">
+                        <b style="font-size:9px; color:var(--primary); display:block;">FECHA EMISIÓN</b>
+                        <span id="p-fecha" style="font-size:11px; font-weight:700;"></span>
+                    </div>
+                    <div style="padding:12px;">
+                        <b style="font-size:9px; color:var(--primary); display:block;">TIPO DOCUMENTO</b>
+                        <span style="font-size:11px; font-weight:700;">Copia Fiel</span>
+                    </div>
+                </div>
+                <table style="width:100%; border-collapse:collapse; margin-top:20px;">
+                    <thead style="background:#1e293b; color:white;">
+                        <tr>
+                            <th style="padding:12px; text-align:left; font-size:10px;">SKU</th>
+                            <th style="padding:12px; text-align:left; font-size:10px;">DESCRIPCIÓN</th>
+                            <th style="padding:12px; text-align:center; font-size:10px;">CANT.</th>
+                        </tr>
+                    </thead>
+                    <tbody id="p-tabla-body"></tbody>
+                </table>
+                <div style="margin-top:60px; display:flex; justify-content:space-between; padding: 0 40px;">
+                    <div style="border-top:2px solid #000; width:220px; text-align:center; padding-top:10px; font-size:10px; font-weight:800;">ALMACÉN SOLAR</div>
+                    <div style="border-top:2px solid #000; width:220px; text-align:center; padding-top:10px; font-size:10px; font-weight:800;">RECIBE CONFORME</div>
+                </div>
+            </div>
+            <img src="INFERIOR.png" class="img-footer">
+        </div>
+    </div>
+
+    <script>
+        let historial = JSON.parse(localStorage.getItem('pdfs_generados') || '[]');
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        function renderTable(data) {
+            const body = document.getElementById('historialBody');
+            body.innerHTML = '';
+            if (data.length === 0) {
+                body.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:50px; color:var(--text-muted);">No se encontraron documentos registrados.</td></tr>';
+                return;
+            }
+            data.forEach((item, index) => {
+                body.innerHTML += `
+                    <tr>
+                        <td><span class="folio-badge">${item.folio}</span></td>
+                        <td><strong style="color:#fff">${item.obra}</strong></td>
+                        <td style="color:var(--text-muted)">${item.fechaHora}</td>
+                        <td style="text-align: right;">
+                            <button class="btn-circle btn-view" onclick="reimprimir(${index})">
+                                <i class="material-icons-round">print</i>
+                            </button>
+                            <button class="btn-circle btn-del" onclick="eliminar(${index})">
+                                <i class="material-icons-round">delete</i>
+                            </button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function filtrar() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const filtrados = historial.filter(h => h.folio.toLowerCase().includes(term) || h.obra.toLowerCase().includes(term));
+            renderTable(filtrados);
+        }
+
+        function eliminar(index) {
+            if(confirm('¿Eliminar registro?')) {
+                historial.splice(index, 1);
+                localStorage.setItem('pdfs_generados', JSON.stringify(historial));
+                renderTable(historial);
+            }
+        }
+
+        function borrarTodo() {
+            if(confirm('¿Borrar todo el historial?')) {
+                historial = [];
+                localStorage.setItem('pdfs_generados', JSON.stringify(historial));
+                renderTable(historial);
+            }
+        }
+
+        function reimprimir(index) {
+            const doc = historial[index];
+            document.getElementById('p-folio').textContent = doc.folio;
+            document.getElementById('p-obra').textContent = doc.obra;
+            document.getElementById('p-fecha').textContent = doc.fechaHora;
+            const tableBody = document.getElementById('p-tabla-body');
+            tableBody.innerHTML = '';
+            doc.items.forEach(item => {
+                tableBody.innerHTML += `<tr><td style="padding:10px; border-bottom:1px solid #eee; font-size:10px;">${item.codigo}</td><td style="padding:10px; border-bottom:1px solid #eee; font-size:10px;">${item.descripcion}</td><td style="padding:10px; border-bottom:1px solid #eee; text-align:center; font-weight:700;">${item.cantidad}</td></tr>`;
+            });
+            window.print();
+        }
+
+        renderTable(historial);
+    </script>
+</body>
+</html>

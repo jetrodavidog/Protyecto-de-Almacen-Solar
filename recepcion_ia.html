@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA SOLAR | Recepción Total Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <style>
+        :root { 
+            --primary: #ff9800; --bg: #020617; --card: rgba(255,255,255,0.03); 
+            --green: #00e676; --red: #ff3d00; --text: #f8fafc;
+        }
+        body { margin: 0; font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+        
+        /* SIDEBAR PRO */
+        .sidebar { position: fixed; left: -280px; width: 280px; height: 100%; background: #0b1224; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); z-index: 2000; box-shadow: 15px 0 40px rgba(0,0,0,0.7); border-right: 1px solid rgba(255,152,0,0.1); }
+        .sidebar.active { left: 0; }
+        .sidebar-header { padding: 40px 25px; font-weight: 900; font-size: 24px; color: var(--primary); letter-spacing: -1px; }
+        .sidebar nav a { display: flex; align-items: center; gap: 15px; color: #94a3b8; text-decoration: none; padding: 18px 25px; transition: 0.3s; }
+        .sidebar nav a:hover, .sidebar nav a.active { background: rgba(255,152,0,0.1); color: white; border-left: 4px solid var(--primary); }
+
+        .menu-btn { position: fixed; top: 20px; left: 20px; background: var(--primary); border: none; border-radius: 15px; padding: 14px; cursor: pointer; z-index: 1500; color: white; box-shadow: 0 8px 20px rgba(255,152,0,0.3); }
+
+        /* CONTENEDOR PRINCIPAL */
+        .container { max-width: 1300px; margin: auto; padding: 100px 25px 50px; }
+        .glass-card { background: var(--card); backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.08); border-radius: 40px; padding: 45px; box-shadow: 0 40px 80px rgba(0,0,0,0.4); }
+
+        /* DROP ZONE */
+        .upload-area { border: 2px dashed rgba(255,152,0,0.2); border-radius: 30px; padding: 60px 20px; text-align: center; cursor: pointer; transition: 0.4s; background: rgba(255,255,255,0.01); }
+        .upload-area:hover { border-color: var(--primary); background: rgba(255,152,0,0.05); transform: translateY(-5px); }
+        .upload-area i { font-size: 60px; color: var(--primary); margin-bottom: 15px; }
+
+        /* TABLA DE RESULTADOS */
+        .results-section { display: none; margin-top: 40px; animation: fadeInUp 0.5s ease forwards; }
+        @keyframes fadeInUp { from { opacity:0; transform: translateY(30px); } to { opacity:1; transform: translateY(0); } }
+
+        table { width: 100%; border-collapse: separate; border-spacing: 0 12px; }
+        th { padding: 15px 20px; text-align: left; color: #64748b; font-size: 11px; text-transform: uppercase; letter-spacing: 2px; }
+        td { background: rgba(255,255,255,0.04); padding: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
+        td:first-child { border-radius: 20px 0 0 20px; }
+        td:last-child { border-radius: 0 20px 20px 0; }
+
+        /* INPUTS Y SELECTS */
+        .input-pro { background: #0f172a; border: 1px solid rgba(255,255,255,0.1); color: white; padding: 12px 15px; border-radius: 12px; width: 100%; font-family: 'Outfit'; transition: 0.3s; }
+        .input-pro:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 15px rgba(255,152,0,0.2); }
+        .sku-new { border-color: var(--red) !important; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255,61,0, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255,61,0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255,61,0, 0); } }
+
+        .btn-save { background: var(--green); color: #020617; border: none; padding: 22px; width: 100%; border-radius: 20px; font-weight: 900; font-size: 20px; cursor: pointer; margin-top: 40px; text-transform: uppercase; letter-spacing: 1px; transition: 0.4s; }
+        .btn-save:hover { background: #00ff88; transform: scale(1.02); box-shadow: 0 20px 40px rgba(0,230,118,0.3); }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(5px); display: none; z-index: 1000; }
+        .overlay.active { display: block; }
+    </style>
+</head>
+<body>
+
+<button class="menu-btn" onclick="toggleSidebar()"><i class="material-icons-round">menu</i></button>
+<div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">SOLAR CONTROL</div>
+    <nav>
+        <a href="index.html"><i class="material-icons-round">dashboard</i> Inventario Real</a>
+        <a href="recepcion_ia.html" class="active"><i class="material-icons-round">receipt_long</i> Recepción XML</a>
+        <a href="generador_pdf.html"><i class="material-icons-round">local_shipping</i> Vales de Salida</a>
+        <a href="pdfs_generados.html"><i class="material-icons-round">history</i> Historial Log</a>
+    </nav>
+</aside>
+
+<div class="container">
+    <div class="glass-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 40px;">
+            <h1 style="margin:0; font-size: 38px; font-weight: 900;">Recepción <span style="color:var(--primary)">Inteligente</span></h1>
+            <div id="statusLoad" style="font-size: 12px; color: var(--green); display:none;">● CATÁLOGO SINCRONIZADO</div>
+        </div>
+
+        <div class="upload-area" onclick="document.getElementById('xmlInput').click()">
+            <i class="material-icons-round">cloud_upload</i>
+            <h2 style="margin:0;">Arrastra o Selecciona XML</h2>
+            <p style="opacity:0.6;">Sincronización masiva con detección automática de materiales</p>
+            <input type="file" id="xmlInput" hidden accept=".xml" onchange="analizarDocumento(this)">
+        </div>
+
+        <div id="results" class="results-section">
+            <div style="margin-bottom:20px; padding:20px; background:rgba(255,255,255,0.03); border-radius:20px; border:1px solid rgba(255,255,255,0.05);">
+                <span id="provData" style="font-weight:900; color:var(--primary); font-size:18px;"></span>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 50px;"></th>
+                        <th style="width: 180px;">Tu SKU / Código</th>
+                        <th>Descripción (Factura)</th>
+                        <th style="width: 200px;">Categoría</th>
+                        <th style="width: 80px; text-align: center;">Cant.</th>
+                    </tr>
+                </thead>
+                <tbody id="resBody"></tbody>
+            </table>
+            <button class="btn-save" onclick="finalizarCargaCompleta()">Inyectar Entrada al Inventario Global</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let masterProducts = [];
+    let masterCategories = new Set();
+    let facturaItems = [];
+
+    async function loadMasterData() {
+        try {
+            const r = await fetch('materiales_convertidos.csv');
+            const data = await r.text();
+            masterProducts = data.split('\n').slice(1).map(f => {
+                const c = f.split(',');
+                if(!c[0]) return null;
+                const categoriaVal = c[1] ? c[1].trim() : "VARIOS";
+                masterCategories.add(categoriaVal); // Guardar categorías únicas del CSV
+                return { 
+                    sku: c[0].trim(), 
+                    desc: c.slice(4).join(',').replace(/"/g,'').trim().toUpperCase(),
+                    cat: categoriaVal
+                };
+            }).filter(i => i !== null);
+            document.getElementById('statusLoad').style.display = 'block';
+        } catch(e) { console.error("Error al leer base de datos maestra."); }
+    }
+
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('active');
+        document.getElementById('overlay').classList.toggle('active');
+    }
+
+    function analizarDocumento(input) {
+        const file = input.files[0];
+        if(!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const parser = new DOMParser();
+            const xml = parser.parseFromString(e.target.result, "text/xml");
+            const emisor = xml.getElementsByTagName("cfdi:Emisor")[0]?.getAttribute("Nombre") || "PROVEEDOR";
+            const nodos = xml.getElementsByTagName("cfdi:Concepto");
+
+            facturaItems = [];
+            for (let n of nodos) {
+                const dXML = n.getAttribute("Descripcion").toUpperCase();
+                const qXML = parseFloat(n.getAttribute("Cantidad"));
+                let match = masterProducts.find(m => dXML.includes(m.desc) || m.desc.includes(dXML));
+
+                facturaItems.push({
+                    sku: match ? match.sku : "",
+                    desc: dXML,
+                    categoria: match ? match.cat : "VARIOS", // Respetar la del CSV si existe
+                    cantidad: qXML,
+                    esNuevo: !match,
+                    proveedor: emisor
+                });
+            }
+            renderizarInterfaz(emisor);
+        };
+        reader.readAsText(file);
+    }
+
+    function renderizarInterfaz(prov) {
+        document.getElementById('provData').innerText = "PROVEEDOR: " + prov;
+        const body = document.getElementById('resBody');
+        body.innerHTML = "";
+
+        // Generar las opciones del Select basadas en el CSV
+        const catOptions = Array.from(masterCategories)
+            .sort()
+            .map(cat => `<option value="${cat}">${cat}</option>`)
+            .join('');
+
+        facturaItems.forEach((item, i) => {
+            body.innerHTML += `
+                <tr id="row-${i}">
+                    <td>
+                        <button style="color:var(--red); background:none; border:none; cursor:pointer;" onclick="removerFila(${i})">
+                            <i class="material-icons-round">delete_sweep</i>
+                        </button>
+                    </td>
+                    <td>
+                        <input type="text" class="input-pro ${item.esNuevo ? 'sku-new' : ''}" 
+                               value="${item.sku}" placeholder="CÓDIGO SKU"
+                               onchange="facturaItems[${i}].sku = this.value">
+                    </td>
+                    <td>
+                        <span style="font-size:13px; font-weight:600; color:#cbd5e1;">${item.desc}</span>
+                    </td>
+                    <td>
+                        <select class="input-pro" onchange="facturaItems[${i}].categoria = this.value">
+                            <option value="${item.categoria}">${item.categoria}</option>
+                            ${catOptions}
+                            <option value="VARIOS">VARIOS</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" class="input-pro" style="text-align:center;" value="${item.cantidad}"
+                               onchange="facturaItems[${i}].cantidad = this.value">
+                    </td>
+                </tr>`;
+        });
+        document.getElementById('results').style.display = 'block';
+    }
+
+    function removerFila(idx) {
+        facturaItems.splice(idx, 1);
+        renderizarInterfaz(document.getElementById('provData').innerText.replace("PROVEEDOR: ", ""));
+    }
+
+    function finalizarCargaCompleta() {
+        if(facturaItems.length === 0) return;
+        const incompletos = facturaItems.some(i => i.sku === "");
+        if(incompletos) return alert("Error: Hay productos nuevos sin código SKU asignado.");
+
+        let movimientos = JSON.parse(localStorage.getItem('movimientos') || '[]');
+        let baseMaestraLocal = JSON.parse(localStorage.getItem('productos_manuales') || '[]');
+        const hoy = new Date().toISOString().split('T')[0];
+
+        facturaItems.forEach(item => {
+            movimientos.push({
+                codigo: item.sku,
+                descripcion: item.desc,
+                cantidad: parseFloat(item.cantidad),
+                tipo: 'Entrada', 
+                obra: 'COMPRA: ' + item.proveedor,
+                responsable: 'RECEPCIÓN XML',
+                fecha: hoy,
+                timestamp: Date.now()
+            });
+
+            if(item.esNuevo) {
+                baseMaestraLocal.push({
+                    sku: item.sku,
+                    desc: item.desc,
+                    categoria: item.categoria,
+                    unidad: 'PZ'
+                });
+            }
+        });
+
+        localStorage.setItem('movimientos', JSON.stringify(movimientos));
+        localStorage.setItem('productos_manuales', JSON.stringify(baseMaestraLocal));
+
+        alert("¡PROCESO COMPLETADO! Se actualizaron los movimientos y se dieron de alta los productos nuevos.");
+        window.location.href = 'index.html';
+    }
+
+    loadMasterData();
+</script>
+</body>
+</html>

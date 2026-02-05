@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA ALMACÉN SOLAR | Generador de Vales</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <style>
+        /* ================= UI INTERFAZ (PANTALLA) ================= */
+        :root { 
+            --primary: #ff9800; 
+            --primary-hover: #e68a00;
+            --dark-bg: #0f172a; 
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+        
+        * { box-sizing: border-box; transition: all 0.2s ease; }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)),
+                        url('fondo_fotovoltaico.png') center/cover fixed;
+            color: white; min-height: 100vh;
+        }
+
+        /* =========================================
+           SIDEBAR CORREGIDO (ALTURA TOTAL)
+        ========================================= */
+        .sidebar { 
+            position: fixed; 
+            top: 0; /* Asegura inicio en el borde superior */
+            left: -280px; 
+            width: 280px; 
+            height: 100%; /* Abarca toda la altura */
+            background: #0b1224; 
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 2000; 
+            box-shadow: 15px 0 40px rgba(0,0,0,0.7); 
+            border-right: 1px solid rgba(255,152,0,0.1); 
+        }
+        .sidebar.active { left: 0; }
+        
+        .sidebar-header { 
+            padding: 40px 25px; 
+            font-weight: 900; 
+            font-size: 24px; 
+            color: var(--primary); 
+            letter-spacing: -1px; 
+            font-family: 'Outfit', sans-serif;
+        }
+        .sidebar nav a { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            color: #94a3b8; 
+            text-decoration: none; 
+            padding: 18px 25px; 
+            transition: 0.3s; 
+            font-family: 'Outfit', sans-serif;
+        }
+        .sidebar nav a:hover, .sidebar nav a.active { 
+            background: rgba(255,152,0,0.1); 
+            color: white; 
+            border-left: 4px solid var(--primary); 
+        }
+
+        .menu-btn { 
+            position: fixed; 
+            top: 20px; 
+            left: 20px; 
+            background: var(--primary); 
+            border: none; 
+            border-radius: 15px; 
+            padding: 14px; 
+            cursor: pointer; 
+            z-index: 1500; 
+            color: white; 
+            box-shadow: 0 8px 20px rgba(255,152,0,0.3); 
+            display: flex;
+        }
+
+        .overlay { 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.75); 
+            backdrop-filter: blur(5px); 
+            display: none; 
+            z-index: 1000; 
+        }
+        .overlay.active { display: block; }
+
+        /* --- RESTO DEL CÓDIGO (SIN MODIFICAR LÓGICA) --- */
+        .top-controls {
+            max-width: 1100px; margin: 100px auto 30px; padding: 30px;
+            background: var(--glass); border: 1px solid var(--glass-border);
+            backdrop-filter: blur(15px); border-radius: 24px;
+            display: flex; gap: 20px; justify-content: center; align-items: center; flex-wrap: wrap;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .filter-group { 
+            display: flex; align-items: center; gap: 12px; 
+            background: rgba(0,0,0,0.3); padding: 12px 20px; border-radius: 14px; 
+            border: 1px solid var(--glass-border);
+        }
+        
+        select, input[type="date"] { 
+            background: #1e293b; color: white; padding: 12px; 
+            border-radius: 10px; border: 1px solid var(--glass-border); outline: none; font-weight: 600; 
+        }
+
+        .btn-print {
+            background: var(--primary); color: #000; border: none; padding: 14px 25px;
+            border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-print:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
+        /* ================= FORMATO PDF ================= */
+        .page {
+            width: 210mm; min-height: 297mm; margin: 20px auto;
+            background: #fff; position: relative; color: #1e293b;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5); display: flex; flex-direction: column;
+            border-radius: 4px;
+        }
+
+        .img-header { width: 100%; display: block; }
+        .img-footer { width: 100%; display: block; margin-top: auto; }
+
+        .pdf-body {
+            padding: 10mm 18mm 25mm 18mm; flex-grow: 1; position: relative; z-index: 10;
+        }
+
+        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .logo-container img { height: 130px; width: auto; }
+
+        .data-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+            background: #e2e8f0; border: 1px solid #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 25px;
+        }
+        .data-cell { background: white; padding: 12px; }
+        .data-cell b { display: block; font-size: 9px; color: var(--primary); text-transform: uppercase; margin-bottom: 3px; }
+        .data-cell span { font-size: 11px; font-weight: 700; color: #0f172a; }
+
+        .main-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .main-table th { background: #1e293b; color: white; padding: 12px; font-size: 10px; text-align: left; text-transform: uppercase; }
+        .main-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 13px; color: #334155; }
+
+        .signatures { display: flex; justify-content: space-between; margin-top: 50px; padding: 0 20px; }
+        .sig-line { width: 220px; border-top: 2px solid #000; text-align: center; padding-top: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+
+        @media print {
+            @page { size: A4; margin: 0; }
+            body { background: none !important; }
+            .top-controls, .sidebar, .menu-btn, .overlay { display: none !important; }
+            .page { margin: 0; box-shadow: none; width: 210mm; min-height: 297mm; border-radius: 0; }
+            .img-footer { position: fixed; bottom: 0; left: 0; z-index: 100; }
+            .pdf-body { margin-bottom: 40mm; }
+            .main-table tr { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="menu-btn" onclick="toggleSidebar()"><i class="material-icons-round">menu</i></button>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">SOLAR CONTROL</div>
+        <nav>
+            <a href="index.html"><i class="material-icons-round">dashboard</i> Inventario Real</a>
+            <a href="recepcion_ia.html"><i class="material-icons-round">receipt_long</i> Recepción XML</a>
+            <a href="generador_pdf.html" class="active"><i class="material-icons-round">local_shipping</i> Vales de Salida</a>
+            <a href="pdfs_generados.html"><i class="material-icons-round">history</i> Historial Log</a>
+        </nav>
+    </aside>
+
+    <div class="top-controls">
+        <select id="obraSelect" onchange="procesarData()">
+            <option value="">-- Seleccionar Proyecto --</option>
+        </select>
+
+        <div class="filter-group">
+            <input type="checkbox" id="usarFiltro" onchange="toggleFiltro()" style="width: 20px; height: 20px; cursor: pointer;">
+            <label style="font-size: 14px; font-weight: 600; cursor: pointer;">Filtrar por Fecha</label>
+        </div>
+
+        <div id="fechaInputs" style="display:none; gap:10px;">
+            <input type="date" id="f1" onchange="procesarData()">
+            <input type="date" id="f2" onchange="procesarData()">
+        </div>
+
+        <button class="btn-print" onclick="imprimirReporte()">
+            <i class="material-icons-round">print</i> Generar PDF
+        </button>
+    </div>
+
+    <div class="page" id="capture">
+        <img src="SUPERIOR.png" class="img-header">
+        
+        <div class="pdf-body">
+            <div class="header-flex">
+                <div class="logo-container"><img src="logo.png"></div>
+                <div style="text-align: right;">
+                    <h1 style="margin:0; font-family:'Outfit'; font-size:36px; color:#1e293b; letter-spacing: -1px;">Vale de Salida</h1>
+                    <p style="margin:0; color:var(--primary); font-weight:900; font-size:12px; letter-spacing: 2px;">LOGÍSTICA Y SUMINISTROS</p>
+                </div>
+            </div>
+
+            <div class="data-grid">
+                <div class="data-cell"><b>Folio Vale</b><span id="v-folio">---</span></div>
+                <div class="data-cell"><b>Fecha Emisión</b><span id="v-fecha">--/--/--</span></div>
+                <div class="data-cell"><b>Responsable Obra</b><span id="v-resp">---</span></div>
+                <div class="data-cell"><b>Proyecto / Destino</b><span id="v-obra">---</span></div>
+            </div>
+
+            <table class="main-table">
+                <thead>
+                    <tr>
+                        <th style="width:120px">Código / SKU</th>
+                        <th>Descripción Técnica del Material</th>
+                        <th style="text-align:center; width:90px">Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody id="v-tabla"></tbody>
+            </table>
+
+            <div class="signatures">
+                <div class="sig-line">Entregado por (Almacén)</div>
+                <div class="sig-line">Recibe Responsable (Obra)</div>
+            </div>
+        </div>
+
+        <img src="INFERIOR.png" class="img-footer">
+    </div>
+
+    <script>
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        let movimientos = JSON.parse(localStorage.getItem('movimientos') || '[]');
+        let catalogo = {};
+
+        async function iniciar() {
+            try {
+                const r = await fetch('materiales_convertidos.csv');
+                const t = await r.text();
+                t.split(/\r?\n/).slice(1).forEach(l => {
+                    const c = l.split(',');
+                    if(c[0]) catalogo[c[0].trim()] = c.slice(4).join(',').replace(/"/g, '').trim();
+                });
+            } catch(e) { console.warn("Catálogo no detectado."); }
+
+            const sel = document.getElementById('obraSelect');
+            const obras = [...new Set(movimientos.map(m => (m.obra || "").trim()))].filter(o => o !== "");
+            obras.sort().forEach(o => {
+                const op = document.createElement('option');
+                op.value = o; op.textContent = o;
+                sel.appendChild(op);
+            });
+        }
+
+        function toggleFiltro() {
+            document.getElementById('fechaInputs').style.display = document.getElementById('usarFiltro').checked ? 'flex' : 'none';
+            procesarData();
+        }
+
+        function procesarData() {
+            const obra = document.getElementById('obraSelect').value.trim();
+            const filtrar = document.getElementById('usarFiltro').checked;
+            const fInicio = document.getElementById('f1').value;
+            const fFin = document.getElementById('f2').value;
+            const tabla = document.getElementById('v-tabla');
+            
+            tabla.innerHTML = '';
+            if(!obra) return;
+
+            document.getElementById('v-obra').textContent = obra;
+            document.getElementById('v-fecha').textContent = new Date().toLocaleDateString();
+            document.getElementById('v-folio').textContent = "VAL-" + Date.now().toString().slice(-6);
+
+            const d1 = fInicio ? new Date(fInicio + "T00:00:00") : new Date(0);
+            const d2 = fFin ? new Date(fFin + "T23:59:59") : new Date(2050,0,1);
+
+            const resumen = {};
+            let responsable = "---";
+
+            movimientos.forEach(m => {
+                const mObra = (m.obra || "").trim();
+                const mTipo = (m.tipo || "").trim().toUpperCase();
+
+                if (mObra === obra && mTipo.includes("SALIDA")) {
+                    let pasa = true;
+                    if (filtrar) {
+                        const fRaw = m.fecha;
+                        const fMov = fRaw.includes('/') ? 
+                            new Date(fRaw.split('/').reverse().join('-') + "T00:00:00") : 
+                            new Date(fRaw + "T00:00:00");
+                        pasa = (fMov >= d1 && fMov <= d2);
+                    }
+
+                    if (pasa) {
+                        const sku = (m.codigo || "").trim();
+                        const q = parseFloat(m.cantidad) || 0;
+                        resumen[sku] = (resumen[sku] || 0) + q;
+                        if(m.responsable) responsable = m.responsable;
+                    }
+                }
+            });
+
+            document.getElementById('v-resp').textContent = responsable;
+
+            Object.keys(resumen).forEach(sku => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight:700">${sku}</td>
+                    <td style="font-size:11px">${catalogo[sku] || 'DESCRIPCIÓN NO ENCONTRADA'}</td>
+                    <td style="text-align:center; font-weight:800">${resumen[sku]}</td>
+                `;
+                tabla.appendChild(tr);
+            });
+        }
+
+        function imprimirReporte() {
+            window.print();
+        }
+
+        iniciar();
+    </script>
+</body>
+</html>
