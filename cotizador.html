@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COTIZADOR | SISTEMA ALMACÉN SOLAR</title>
+    <title>SISTEMA ALMACÉN SOLAR | Solicitud de Cotización</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@600;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
@@ -25,267 +25,254 @@
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
+            /* ======= FONDO RESTAURADO SEGÚN TU CÓDIGO ANTERIOR ======= */
             background: linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)),
                         url('fondo_fotovoltaico.jpg') center/cover fixed;
             color: white; min-height: 100vh;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
-
-        .glass-card {
-            background: var(--glass);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
+        /* SIDEBAR CORREGIDO (ESTILO SOLICITADO) */
+        .sidebar { 
+            position: fixed; top: 0; left: -280px; width: 280px; height: 100%; 
+            background: #0b1224; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            z-index: 2000; box-shadow: 15px 0 40px rgba(0,0,0,0.7); border-right: 1px solid rgba(255,152,0,0.1); 
         }
-
-        h1 { font-family: 'Outfit', sans-serif; font-weight: 800; color: var(--primary); margin: 0 0 10px 0; }
-        p.subtitle { color: var(--text-muted); margin-bottom: 30px; }
-
-        /* Estilos del Formulario */
-        .controls { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .sidebar.active { left: 0; }
         
-        input, select, button {
-            padding: 12px 18px;
-            border-radius: 12px;
-            border: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.05);
-            color: white;
-            font-family: inherit;
-            outline: none;
+        .sidebar-header { 
+            padding: 40px 25px; font-weight: 900; font-size: 24px; 
+            color: var(--primary); letter-spacing: -1px; font-family: 'Outfit', sans-serif;
+        }
+        .sidebar nav a { 
+            display: flex; align-items: center; gap: 15px; color: #94a3b8; 
+            text-decoration: none; padding: 18px 25px; transition: 0.3s; 
+            font-family: 'Outfit', sans-serif;
+        }
+        .sidebar nav a:hover, .sidebar nav a.active { 
+            background: rgba(255,152,0,0.1); color: white; border-left: 4px solid var(--primary); 
         }
 
-        input:focus { border-color: var(--primary); background: rgba(255,255,255,0.1); }
-
-        .btn-add { background: var(--primary); color: #000; font-weight: 700; cursor: pointer; border: none; }
-        .btn-add:hover { background: var(--primary-hover); transform: translateY(-2px); }
-
-        .btn-print { background: #22c55e; color: white; border: none; cursor: pointer; font-weight: 700; }
-        .btn-print:hover { background: #16a34a; }
-
-        /* Tabla Interactiva */
-        table.editor-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { text-align: left; color: var(--text-muted); padding: 10px; font-size: 12px; text-transform: uppercase; }
-        td { padding: 10px; border-bottom: 1px solid var(--glass-border); }
-
-        .row-qty { width: 80px; }
-        .row-unit { width: 120px; }
-        .row-code { width: 250px; }
-        .row-desc { color: var(--text-muted); font-size: 14px; }
-        .btn-del { color: #ef4444; cursor: pointer; background: none; border: none; }
-
-        /* ================= ESTILO PARA IMPRESIÓN (PDF) ================= */
-        #reporte {
-            display: none; /* Oculto en pantalla */
-            background: white;
-            color: black;
-            width: 210mm;
-            min-height: 297mm;
-            padding: 20mm;
-            margin: 0 auto;
-            position: relative;
-            box-sizing: border-box;
+        .menu-btn { 
+            position: fixed; top: 20px; left: 20px; background: var(--primary); 
+            border: none; border-radius: 15px; padding: 14px; cursor: pointer; 
+            z-index: 1500; color: white; box-shadow: 0 8px 20px rgba(255,152,0,0.3); display: flex;
         }
+
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(5px); display: none; z-index: 1000; }
+        .overlay.active { display: block; }
+
+        /* TOP CONTROLS (ESTILO SOLICITADO) */
+        .top-controls {
+            max-width: 1100px; margin: 100px auto 30px; padding: 30px;
+            background: var(--glass); border: 1px solid var(--glass-border);
+            backdrop-filter: blur(15px); border-radius: 24px;
+            display: flex; gap: 20px; justify-content: center; align-items: center; flex-wrap: wrap;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        select, input[type="text"] { 
+            background: #1e293b; color: white; padding: 12px; 
+            border-radius: 10px; border: 1px solid var(--glass-border); outline: none; font-weight: 600; 
+        }
+
+        .btn-print {
+            background: var(--primary); color: #000; border: none; padding: 14px 25px;
+            border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-print:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
+        /* ================= FORMATO PDF / IMPRESIÓN ================= */
+        .page {
+            width: 210mm; min-height: 297mm; margin: 20px auto;
+            background: #fff; position: relative; color: #1e293b;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5); display: flex; flex-direction: column;
+            border-radius: 4px;
+        }
+
+        .img-preview-header { width: 100%; display: block; }
+        .img-preview-footer { width: 100%; display: block; margin-top: auto; }
+
+        .pdf-body { padding: 5mm 18mm 25mm 18mm; flex-grow: 1; position: relative; z-index: 10; }
+
+        .header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .logo-container img { height: 110px; width: auto; }
+
+        .main-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .main-table th { background: #1e293b; color: white; padding: 12px; font-size: 10px; text-align: left; text-transform: uppercase; }
+        .main-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 13px; color: #334155; }
+
+        .input-pdf { width: 100%; border: 1px solid #cbd5e1; padding: 5px; border-radius: 4px; font-family: inherit; background: transparent; }
+        .btn-del { color: #ef4444; background: none; border: none; cursor: pointer; }
+
+        .signatures { display: flex; justify-content: center; margin-top: 50px; }
+        .sig-line { width: 320px; border-top: 2px solid #000; text-align: center; padding-top: 8px; font-size: 13px; font-weight: 800; text-transform: uppercase; }
 
         @media print {
-            body { background: white !important; padding: 0 !important; }
-            .container, .sidebar { display: none !important; }
-            #reporte { display: block !important; }
             @page { size: A4; margin: 0; }
+            body { background: none !important; }
+            .top-controls, .sidebar, .menu-btn, .overlay, .col-del, .btn-del, .img-preview-header, .img-preview-footer { display: none !important; }
+            .page { margin: 0; box-shadow: none; width: 210mm; border-radius: 0; }
+            
+            .img-header-fixed { position: fixed; top: 0; left: 0; width: 100%; display: block !important; }
+            .img-footer-fixed { position: fixed; bottom: 0; left: 0; width: 100%; display: block !important; }
+            
+            .header-spacer { height: 45mm; display: block !important; }
+            .footer-spacer { height: 40mm; display: block !important; }
+
+            .input-pdf { border: none !important; padding: 0; appearance: none; color: black; font-weight: bold; }
         }
 
-        .header-pdf { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
-        .header-pdf img { height: 80px; }
-        .info-empresa { text-align: right; font-size: 10px; color: #444; }
-
-        .solicitud-texto { margin: 30px 0; font-size: 14px; line-height: 1.6; text-align: justify; }
-
-        .tabla-pdf { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .tabla-pdf th { background: #f0f0f0; color: #000; border: 1px solid #ddd; padding: 10px; font-size: 12px; }
-        .tabla-pdf td { border: 1px solid #ddd; padding: 10px; font-size: 12px; }
-
-        .footer-pdf { position: absolute; bottom: 20mm; left: 20mm; right: 20mm; }
-        .footer-pdf img { width: 100%; }
+        .img-header-fixed, .img-footer-fixed, .header-spacer, .footer-spacer { display: none; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="glass-card">
-            <h1>Cotizador de Materiales</h1>
-            <p class="subtitle">Genera solicitudes de compra con búsqueda inteligente de códigos.</p>
-            
-            <div class="controls">
-                <input type="text" id="cliente-nombre" placeholder="Nombre del Cliente/Proveedor (Para el PDF)">
-                <button class="btn-add" onclick="agregarFila()"><span class="material-icons-round">add</span> Agregar Fila</button>
-                <button class="btn-print" onclick="prepararPDF()"><span class="material-icons-round">picture_as_pdf</span> Guardar PDF</button>
-            </div>
+    <button class="menu-btn" onclick="toggleSidebar()"><i class="material-icons-round">menu</i></button>
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
-            <table class="editor-table">
-                <thead>
-                    <tr>
-                        <th>Cant.</th>
-                        <th>Medida</th>
-                        <th>Código Inteligente</th>
-                        <th>Descripción (Auto)</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody id="tabla-cuerpo">
-                    </tbody>
-            </table>
-        </div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">SOLAR CONTROL</div>
+        <nav>
+            <a href="index.html"><i class="material-icons-round">dashboard</i> Inventario Real</a>
+            <a href="recepcion_ia.html"><i class="material-icons-round">receipt_long</i> Recepción XML</a>
+            <a href="generador_pdf.html"><i class="material-icons-round">local_shipping</i> Generador PDF</a>
+            <a href="historial_lag.html"><i class="material-icons-round">history</i> Historial Lag.</a>
+            <a href="cotizador.html" class="active"><i class="material-icons-round">request_quote</i> Cotizador</a>
+        </nav>
+    </aside>
+
+    <div class="top-controls">
+        <input type="text" id="nombreArchivo" placeholder="Nombre del Archivo / Cliente" style="width: 240px;">
+        
+        <select id="selectResponsable" onchange="actualizarFirma()">
+            <option value="">-- Seleccionar Elabora --</option>
+            <option value="Ing. Juan Luis B.">Ing. Juan Luis B.</option>
+            <option value="Ing. Braulio R.">Ing. Braulio R.</option>
+            <option value="Ing. Alberto R.">Ing. Alberto R.</option>
+            <option value="Ing. Efrain G.">Ing. Efrain G.</option>
+            <option value="Tecnico. Jetro O.">Tecnico. Jetro O.</option>
+        </select>
+
+        <button class="btn-print" style="background: #22c55e; color: white;" onclick="agregarFila()">
+            <i class="material-icons-round">add</i> Fila
+        </button>
+
+        <button class="btn-print" onclick="imprimirReporte()">
+            <i class="material-icons-round">print</i> Guardar PDF
+        </button>
     </div>
 
-    <datalist id="lista-materiales"></datalist>
+    <datalist id="lista-codigos"></datalist>
 
-    <div id="reporte">
-        <div class="header-pdf">
-            <img src="logo.png" alt="Logo">
-            <div class="info-empresa">
-                <strong>INGENIERÍA ELÉCTRICA S.A. DE C.V.</strong><br>
-                comercial@iealanis.com | 352 132 7425<br>
-                Ignacio Luis Vallarta #8A, Col. México<br>
-                La Piedad, Michoacán
+    <div class="page" id="documento">
+        <img src="SUPERIOR.png" class="img-header-fixed">
+        <img src="INFERIOR.png" class="img-footer-fixed">
+        <div class="header-spacer"></div>
+
+        <img src="SUPERIOR.png" class="img-preview-header">
+        
+        <div class="pdf-body">
+            <div class="header-flex">
+                <div class="logo-container"><img src="logo.png"></div>
+                <div style="text-align: right;">
+                    <h1 style="margin:0; font-family:'Outfit'; font-size:32px; color:#1e293b; letter-spacing: -1px;">SOLICITUD DE COTIZACION</h1>
+                    <p style="margin:0; color:var(--primary); font-weight:900; font-size:11px; letter-spacing: 2px;">LOGÍSTICA Y SUMINISTROS</p>
+                </div>
+            </div>
+
+            <p style="font-size: 13px; color: #334155; line-height: 1.6; text-align: justify; margin-bottom: 25px; font-weight: 600;">
+                Por medio del siguiente documento me dirijo a usted como empresa para solicitar el siguiente material descrito y mencionado al igual que las cuentas interbancarias para realizar una transferencia para realizar la compra:
+            </p>
+
+            <table class="main-table">
+                <thead>
+                    <tr>
+                        <th style="width:130px">CÓDIGO</th>
+                        <th>DESCRIPCIÓN</th>
+                        <th style="width:90px">MEDIDA</th>
+                        <th style="text-align:center; width:80px">CANT.</th>
+                        <th class="col-del" style="width: 30px;"></th>
+                    </tr>
+                </thead>
+                <tbody id="v-tabla"></tbody>
+            </table>
+
+            <div class="signatures">
+                <div class="sig-line">
+                    <span id="firmaNombre" style="display: block; min-height: 18px; margin-bottom: 5px;"></span>
+                    Elaborado por
+                </div>
             </div>
         </div>
 
-        <div class="solicitud-texto">
-            Por medio del siguiente documento me dirijo a usted como empresa para solicitar el siguiente material descrito y mencionado al igual que las cuentas interbancarias para realizar una transferencia para realizar la compra:
-        </div>
-
-        <table class="tabla-pdf">
-            <thead>
-                <tr>
-                    <th style="width: 10%;">CANT.</th>
-                    <th style="width: 15%;">MEDIDA</th>
-                    <th style="width: 25%;">CÓDIGO</th>
-                    <th style="width: 50%;">DESCRIPCIÓN</th>
-                </tr>
-            </thead>
-            <tbody id="pdf-tabla-cuerpo">
-                </tbody>
-        </table>
-
-        <div class="footer-pdf">
-            <img src="INFERIOR.png" alt="Footer">
-        </div>
+        <div class="footer-spacer"></div>
+        <img src="INFERIOR.png" class="img-preview-footer">
     </div>
 
     <script>
-        let catalogo = {};
-
-        // 1. CARGAR CSV AL INICIAR
-        async function cargarCSV() {
-            try {
-                const response = await fetch('materiales_convertidos.csv');
-                const data = await response.text();
-                const lineas = data.split('\n');
-                const datalist = document.getElementById('lista-materiales');
-
-                lineas.forEach((linea, index) => {
-                    if (index === 0 || !linea.trim()) return;
-                    
-                    // Manejo básico de comas en descripciones (asumiendo formato estándar)
-                    const columnas = linea.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    if (columnas.length >= 5) {
-                        const codigo = columnas[0].trim();
-                        const descripcion = columnas[4].replace(/"/g, '').trim();
-                        catalogo[codigo] = descripcion;
-
-                        const option = document.createElement('option');
-                        option.value = codigo;
-                        datalist.appendChild(option);
-                    }
-                });
-                console.log("Catálogo cargado correctamente.");
-            } catch (error) {
-                console.error("Error cargando el CSV:", error);
-            }
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
         }
 
-        // 2. AGREGAR FILA A LA TABLA INTERACTIVA
+        let catalogo = {};
+
+        async function cargarCSV() {
+            try {
+                const r = await fetch('materiales_convertidos.csv');
+                const t = await r.text();
+                const dl = document.getElementById('lista-codigos');
+                t.split(/\r?\n/).slice(1).forEach(l => {
+                    const c = l.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    if(c[0]) {
+                        catalogo[c[0].trim()] = c.length > 4 ? c[4].replace(/"/g, '').trim() : '';
+                        const opt = document.createElement('option');
+                        opt.value = c[0].trim();
+                        dl.appendChild(opt);
+                    }
+                });
+            } catch(e) { console.warn("Catálogo no detectado."); }
+            agregarFila();
+        }
+
         function agregarFila() {
-            const tbody = document.getElementById('tabla-cuerpo');
             const tr = document.createElement('tr');
-            
             tr.innerHTML = `
-                <td><input type="number" class="row-qty" value="1" min="1"></td>
+                <td><input type="text" list="lista-codigos" class="input-pdf" oninput="actualizarDesc(this)" placeholder="Código..." style="font-weight:700"></td>
+                <td class="td-desc" style="font-size:11px; color:#94a3b8;">---</td>
                 <td>
-                    <select class="row-unit">
+                    <select class="input-pdf">
                         <option value="Pieza">Pieza</option>
                         <option value="Metro">Metro</option>
                         <option value="Litro">Litro</option>
-                        <option value="Tramo">Tramo</option>
-                        <option value="Caja">Caja</option>
                     </select>
                 </td>
-                <td><input type="text" class="row-code" list="lista-materiales" placeholder="Escribe código..." oninput="actualizarDesc(this)"></td>
-                <td class="row-desc">Seleccione un código...</td>
-                <td><button class="btn-del" onclick="this.parentElement.parentElement.remove()"><span class="material-icons-round">delete</span></button></td>
+                <td><input type="number" class="input-pdf" value="1" min="1" style="text-align:center; font-weight:800"></td>
+                <td class="col-del" style="text-align:center;"><button class="btn-del" onclick="this.parentElement.parentElement.remove()"><i class="material-icons-round" style="font-size:16px;">delete</i></button></td>
             `;
-            tbody.appendChild(tr);
+            document.getElementById('v-tabla').appendChild(tr);
         }
 
-        // 3. ACTUALIZAR DESCRIPCIÓN AUTOMÁTICAMENTE
         function actualizarDesc(input) {
-            const row = input.parentElement.parentElement;
-            const descTd = row.querySelector('.row-desc');
-            const codigo = input.value;
-            
-            if (catalogo[codigo]) {
-                descTd.textContent = catalogo[codigo];
-                descTd.style.color = "#22c55e"; // Verde si existe
-            } else {
-                descTd.textContent = "No encontrado";
-                descTd.style.color = "#94a3b8";
-            }
+            const cod = input.value.trim();
+            const td = input.parentElement.parentElement.querySelector('.td-desc');
+            td.textContent = catalogo[cod] || "No encontrado";
+            td.style.color = catalogo[cod] ? "#334155" : "#94a3b8";
         }
 
-        // 4. PREPARAR PDF Y CAMBIAR NOMBRE
-        function prepararPDF() {
-            const filas = document.querySelectorAll('#tabla-cuerpo tr');
-            const pdfTbody = document.getElementById('pdf-tabla-cuerpo');
-            const nombreCliente = document.getElementById('cliente-nombre').value || "Cotizacion_Sin_Nombre";
-            
-            if (filas.length === 0) {
-                alert("Agrega al menos un material.");
-                return;
-            }
+        function actualizarFirma() {
+            document.getElementById('firmaNombre').textContent = document.getElementById('selectResponsable').value;
+        }
 
-            // Limpiar tabla PDF
-            pdfTbody.innerHTML = "";
-
-            // Copiar datos a la tabla de impresión
-            filas.forEach(fila => {
-                const qty = fila.querySelector('.row-qty').value;
-                const unit = fila.querySelector('.row-unit').value;
-                const code = fila.querySelector('.row-code').value;
-                const desc = fila.querySelector('.row-desc').textContent;
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td style="text-align:center; font-weight:700">${qty}</td>
-                    <td>${unit}</td>
-                    <td style="font-weight:700">${code}</td>
-                    <td>${desc}</td>
-                `;
-                pdfTbody.appendChild(tr);
-            });
-
-            // Cambiar el título del documento (esto será el nombre del archivo al guardar PDF)
-            const fecha = new Date().toISOString().slice(0,10);
-            document.title = `COTIZACION - ${nombreCliente.toUpperCase()} - ${fecha}`;
-
-            // Lanzar impresión
+        function imprimirReporte() {
+            const nom = document.getElementById('nombreArchivo').value.trim();
+            if(!nom) { alert("Escribe un nombre para el archivo."); return; }
+            document.title = nom;
             window.print();
         }
 
-        // Inicializar
-        cargarCSV();
-        agregarFila(); // Empezar con una fila vacía
+        window.onload = cargarCSV;
     </script>
 </body>
 </html>
