@@ -3,248 +3,289 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COTIZADOR OFICIAL | Solar Control</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Outfit:wght@700;900&display=swap" rel="stylesheet">
+    <title>COTIZADOR | SISTEMA ALMACÉN SOLAR</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Outfit:wght@600;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 
     <style>
+        /* ================= UI INTERFAZ (PANTALLA) ================= */
         :root { 
             --primary: #ff9800; 
-            --bg-dark: #0f172a;
-            --glass: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.1);
+            --primary-hover: #e68a00;
+            --dark-bg: #0f172a; 
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
         }
         
-        * { box-sizing: border-box; }
-        body { 
-            margin: 0; font-family: 'Inter', sans-serif; 
-            background: #0a0f1d; color: white;
-            background-image: linear-gradient(rgba(10,15,29,0.95), rgba(10,15,29,0.95)), url('fondo_fotovoltaico.png');
-            background-size: cover; background-attachment: fixed;
+        * { box-sizing: border-box; transition: all 0.2s ease; }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.95)),
+                        url('fondo_fotovoltaico.jpg') center/cover fixed;
+            color: white; min-height: 100vh;
         }
 
-        /* --- SIDEBAR --- */
-        .sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #0b1224; transition: 0.4s; z-index: 2000; border-right: 1px solid var(--border); }
-        .sidebar.active { left: 0; }
-        .sidebar-header { padding: 40px 25px; font-weight: 900; font-size: 24px; color: var(--primary); font-family: 'Outfit'; }
-        .sidebar nav a { display: flex; align-items: center; gap: 15px; color: #94a3b8; text-decoration: none; padding: 18px 25px; font-weight: 600; }
-        .sidebar nav a.active { background: rgba(255,152,0,0.1); color: white; border-left: 4px solid var(--primary); }
-        .menu-btn { position: fixed; top: 20px; left: 20px; background: var(--primary); border: none; border-radius: 12px; padding: 12px; cursor: pointer; z-index: 1500; color: white; display: flex; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
 
-        /* --- UI CONTROLS --- */
-        .ui-container { max-width: 1000px; margin: 90px auto 20px; padding: 25px; background: var(--glass); border: 1px solid var(--border); backdrop-filter: blur(20px); border-radius: 20px; display: grid; grid-template-columns: 2fr 0.5fr 1.5fr auto; gap: 15px; align-items: end; }
-        .field { display: flex; flex-direction: column; gap: 8px; }
-        .field label { font-size: 10px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
-        input { background: #1e293b; border: 1px solid var(--border); padding: 12px; border-radius: 10px; color: white; outline: none; }
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
 
-        .btn-add { background: #4ade80; color: #064e3b; border: none; padding: 12px; border-radius: 10px; font-weight: 900; cursor: pointer; }
-        .btn-print { background: white; color: black; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 900; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        h1 { font-family: 'Outfit', sans-serif; font-weight: 800; color: var(--primary); margin: 0 0 10px 0; }
+        p.subtitle { color: var(--text-muted); margin-bottom: 30px; }
 
-        /* --- PDF FORMAT --- */
-        .page-pdf { width: 210mm; min-height: 297mm; margin: 0 auto 50px; background: white; color: #1e293b; box-shadow: 0 0 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
-        .pdf-content { padding: 15mm 20mm; flex-grow: 1; }
-        .header-img { width: 100%; display: block; }
+        /* Estilos del Formulario */
+        .controls { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        
+        input, select, button {
+            padding: 12px 18px;
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            font-family: inherit;
+            outline: none;
+        }
 
-        .doc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .logo img { height: 80px; }
-        .title-area { text-align: right; }
-        .title-area h1 { margin:0; font-family:'Outfit'; font-size: 35px; color: #0f172a; }
+        input:focus { border-color: var(--primary); background: rgba(255,255,255,0.1); }
 
-        .info-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; background: #f1f5f9; padding: 15px; border-radius: 10px; margin-bottom: 25px; border: 1px solid #e2e8f0; }
-        .info-item b { font-size: 9px; color: #64748b; text-transform: uppercase; display: block; }
-        .info-item span { font-weight: 700; font-size: 14px; color: #0f172a; }
+        .btn-add { background: var(--primary); color: #000; font-weight: 700; cursor: pointer; border: none; }
+        .btn-add:hover { background: var(--primary-hover); transform: translateY(-2px); }
 
-        .table-pro { width: 100%; border-collapse: collapse; }
-        .table-pro th { background: #0f172a; color: white; padding: 12px; text-align: left; font-size: 10px; text-transform: uppercase; }
-        .table-pro td { padding: 12px; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
+        .btn-print { background: #22c55e; color: white; border: none; cursor: pointer; font-weight: 700; }
+        .btn-print:hover { background: #16a34a; }
 
-        .totals { margin-left: auto; width: 250px; margin-top: 30px; }
-        .total-row { display: flex; justify-content: space-between; padding: 5px 0; font-weight: 600; font-size: 14px; }
-        .total-row.main { font-size: 18px; font-weight: 900; color: var(--primary); border-top: 2px solid #0f172a; margin-top: 10px; padding-top: 10px; }
+        /* Tabla Interactiva */
+        table.editor-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { text-align: left; color: var(--text-muted); padding: 10px; font-size: 12px; text-transform: uppercase; }
+        td { padding: 10px; border-bottom: 1px solid var(--glass-border); }
+
+        .row-qty { width: 80px; }
+        .row-unit { width: 120px; }
+        .row-code { width: 250px; }
+        .row-desc { color: var(--text-muted); font-size: 14px; }
+        .btn-del { color: #ef4444; cursor: pointer; background: none; border: none; }
+
+        /* ================= ESTILO PARA IMPRESIÓN (PDF) ================= */
+        #reporte {
+            display: none; /* Oculto en pantalla */
+            background: white;
+            color: black;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 0 auto;
+            position: relative;
+            box-sizing: border-box;
+        }
 
         @media print {
-            .ui-container, .sidebar, .menu-btn, .no-print { display: none !important; }
-            .page-pdf { margin: 0; box-shadow: none; width: 210mm; }
-            body { background: white; }
-            .header-img { width: 100%; }
+            body { background: white !important; padding: 0 !important; }
+            .container, .sidebar { display: none !important; }
+            #reporte { display: block !important; }
+            @page { size: A4; margin: 0; }
         }
+
+        .header-pdf { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
+        .header-pdf img { height: 80px; }
+        .info-empresa { text-align: right; font-size: 10px; color: #444; }
+
+        .solicitud-texto { margin: 30px 0; font-size: 14px; line-height: 1.6; text-align: justify; }
+
+        .tabla-pdf { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .tabla-pdf th { background: #f0f0f0; color: #000; border: 1px solid #ddd; padding: 10px; font-size: 12px; }
+        .tabla-pdf td { border: 1px solid #ddd; padding: 10px; font-size: 12px; }
+
+        .footer-pdf { position: absolute; bottom: 20mm; left: 20mm; right: 20mm; }
+        .footer-pdf img { width: 100%; }
     </style>
 </head>
 <body>
 
-    <button class="menu-btn" onclick="document.getElementById('sidebar').classList.toggle('active')"><i class="material-icons-round">menu</i></button>
+    <div class="container">
+        <div class="glass-card">
+            <h1>Cotizador de Materiales</h1>
+            <p class="subtitle">Genera solicitudes de compra con búsqueda inteligente de códigos.</p>
+            
+            <div class="controls">
+                <input type="text" id="cliente-nombre" placeholder="Nombre del Cliente/Proveedor (Para el PDF)">
+                <button class="btn-add" onclick="agregarFila()"><span class="material-icons-round">add</span> Agregar Fila</button>
+                <button class="btn-print" onclick="prepararPDF()"><span class="material-icons-round">picture_as_pdf</span> Guardar PDF</button>
+            </div>
 
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-header">SOLAR CONTROL</div>
-        <nav>
-            <a href="index.html"><i class="material-icons-round">dashboard</i> Inventario Real</a>
-            <a href="recepcion_ia.html"><i class="material-icons-round">receipt_long</i> Recepción XML</a>
-            <a href="generador_pdf.html"><i class="material-icons-round">local_shipping</i> Vales de Salida</a>
-            <a href="cotizador.html" class="active"><i class="material-icons-round">request_quote</i> Cotizador Pro</a>
-            <a href="pdfs_generados.html"><i class="material-icons-round">history</i> Historial Log</a>
-        </nav>
-    </aside>
-
-    <div class="ui-container no-print">
-        <div class="field">
-            <label>Código exacto (Fila A)</label>
-            <input id="skuInput" list="itemsList" placeholder="Escribe el código...">
-            <datalist id="itemsList"></datalist>
-        </div>
-        <div class="field">
-            <label>Cant.</label>
-            <input type="number" id="cantInput" value="1" min="1">
-        </div>
-        <div class="field">
-            <label>Cliente</label>
-            <input type="text" id="clienteInput" placeholder="Nombre..." oninput="document.getElementById('outCliente').textContent = this.value.toUpperCase() || '---'">
-        </div>
-        <div style="display:flex; gap:10px">
-            <button class="btn-add" onclick="agregarPartida()">+ AÑADIR</button>
-            <button class="btn-print" onclick="window.print()"><i class="material-icons-round">print</i> PDF</button>
+            <table class="editor-table">
+                <thead>
+                    <tr>
+                        <th>Cant.</th>
+                        <th>Medida</th>
+                        <th>Código Inteligente</th>
+                        <th>Descripción (Auto)</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-cuerpo">
+                    </tbody>
+            </table>
         </div>
     </div>
 
-    <div class="page-pdf">
-        <img src="SUPERIOR.png" class="header-img">
-        <div class="pdf-content">
-            <div class="doc-header">
-                <div class="logo"><img src="logo.png"></div>
-                <div class="title-area">
-                    <h1>Presupuesto</h1>
-                    <p style="margin:0; font-weight:900; color:var(--primary); font-size:10px; letter-spacing:2px">SISTEMAS FOTOVOLTAICOS</p>
-                </div>
-            </div>
+    <datalist id="lista-materiales"></datalist>
 
-            <div class="info-strip">
-                <div class="info-item"><b>CLIENTE / PROYECTO:</b><span id="outCliente">---</span></div>
-                <div class="info-item" style="text-align: right;"><b>FECHA:</b><span id="outFecha">--/--/--</span></div>
-            </div>
-
-            <table class="table-pro">
-                <thead>
-                    <tr>
-                        <th style="width:40px; text-align:center">Cant</th>
-                        <th>Código / Descripción</th>
-                        <th style="text-align:right; width:120px">Unitario</th>
-                        <th style="text-align:right; width:120px">Subtotal</th>
-                        <th class="no-print" style="width:30px"></th>
-                    </tr>
-                </thead>
-                <tbody id="tablaCuerpo"></tbody>
-            </table>
-
-            <div class="totals">
-                <div class="total-row"><span>Subtotal:</span> <span id="resSub">$0.00</span></div>
-                <div class="total-row"><span>IVA (16%):</span> <span id="resIva">$0.00</span></div>
-                <div class="total-row main"><span>TOTAL MXN:</span> <span id="resTotal">$0.00</span></div>
+    <div id="reporte">
+        <div class="header-pdf">
+            <img src="logo.png" alt="Logo">
+            <div class="info-empresa">
+                <strong>INGENIERÍA ELÉCTRICA S.A. DE C.V.</strong><br>
+                comercial@iealanis.com | 352 132 7425<br>
+                Ignacio Luis Vallarta #8A, Col. México<br>
+                La Piedad, Michoacán
             </div>
         </div>
-        <img src="INFERIOR.png" class="header-img" style="margin-top:auto">
+
+        <div class="solicitud-texto">
+            Por medio del siguiente documento me dirijo a usted como empresa para solicitar el siguiente material descrito y mencionado al igual que las cuentas interbancarias para realizar una transferencia para realizar la compra:
+        </div>
+
+        <table class="tabla-pdf">
+            <thead>
+                <tr>
+                    <th style="width: 10%;">CANT.</th>
+                    <th style="width: 15%;">MEDIDA</th>
+                    <th style="width: 25%;">CÓDIGO</th>
+                    <th style="width: 50%;">DESCRIPCIÓN</th>
+                </tr>
+            </thead>
+            <tbody id="pdf-tabla-cuerpo">
+                </tbody>
+        </table>
+
+        <div class="footer-pdf">
+            <img src="INFERIOR.png" alt="Footer">
+        </div>
     </div>
 
     <script>
-        let catalogoGlobal = {};
-        let listaCotizacion = [];
+        let catalogo = {};
 
-        // Función centralizada de formato de dinero para evitar fallas
-        function formatoPesos(valor) {
-            return new Intl.NumberFormat('es-MX', {
-                style: 'currency',
-                currency: 'MXN',
-                minimumFractionDigits: 2
-            }).format(valor);
-        }
-
+        // 1. CARGAR CSV AL INICIAR
         async function cargarCSV() {
             try {
-                const res = await fetch('materiales_convertidos.csv');
-                const csvText = await res.text();
-                const filas = csvText.split(/\r?\n/).slice(1);
-                const datalist = document.getElementById('itemsList');
+                const response = await fetch('materiales_convertidos.csv');
+                const data = await response.text();
+                const lineas = data.split('\n');
+                const datalist = document.getElementById('lista-materiales');
 
-                filas.forEach(fila => {
-                    const c = fila.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-                    if (c.length >= 6) {
-                        const codigoA = c[0].replace(/"/g, '').trim();
-                        const descripcionE = c[4].replace(/"/g, '').trim();
-                        
-                        // LIMPIEZA AGRESIVA: Solo deja números y puntos decimales
-                        let precioTexto = c[5].replace(/[^\d.]/g, '');
-                        const precioF = parseFloat(precioTexto) || 0;
+                lineas.forEach((linea, index) => {
+                    if (index === 0 || !linea.trim()) return;
+                    
+                    // Manejo básico de comas en descripciones (asumiendo formato estándar)
+                    const columnas = linea.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                    if (columnas.length >= 5) {
+                        const codigo = columnas[0].trim();
+                        const descripcion = columnas[4].replace(/"/g, '').trim();
+                        catalogo[codigo] = descripcion;
 
-                        if (codigoA) {
-                            catalogoGlobal[codigoA] = {
-                                descripcion: descripcionE,
-                                precio: precioF
-                            };
-
-                            const opt = document.createElement('option');
-                            opt.value = codigoA;
-                            opt.textContent = descripcionE;
-                            datalist.appendChild(opt);
-                        }
+                        const option = document.createElement('option');
+                        option.value = codigo;
+                        datalist.appendChild(option);
                     }
                 });
-            } catch(e) { console.error("Error cargando CSV"); }
-        }
-
-        function agregarPartida() {
-            const sku = document.getElementById('skuInput').value.trim();
-            const cant = parseFloat(document.getElementById('cantInput').value);
-            
-            if (catalogoGlobal.hasOwnProperty(sku)) {
-                const item = catalogoGlobal[sku];
-                listaCotizacion.push({
-                    codigo: sku,
-                    desc: item.descripcion,
-                    unitario: item.precio, // Guardamos el número puro
-                    cant: cant,
-                    total: cant * item.precio
-                });
-                
-                document.getElementById('skuInput').value = '';
-                actualizarTabla();
-            } else {
-                alert("EL CÓDIGO NO EXISTE EN EL CSV. Revisa la columna A.");
+                console.log("Catálogo cargado correctamente.");
+            } catch (error) {
+                console.error("Error cargando el CSV:", error);
             }
         }
 
-        function eliminar(i) {
-            listaCotizacion.splice(i, 1);
-            actualizarTabla();
+        // 2. AGREGAR FILA A LA TABLA INTERACTIVA
+        function agregarFila() {
+            const tbody = document.getElementById('tabla-cuerpo');
+            const tr = document.createElement('tr');
+            
+            tr.innerHTML = `
+                <td><input type="number" class="row-qty" value="1" min="1"></td>
+                <td>
+                    <select class="row-unit">
+                        <option value="Pieza">Pieza</option>
+                        <option value="Metro">Metro</option>
+                        <option value="Litro">Litro</option>
+                        <option value="Tramo">Tramo</option>
+                        <option value="Caja">Caja</option>
+                    </select>
+                </td>
+                <td><input type="text" class="row-code" list="lista-materiales" placeholder="Escribe código..." oninput="actualizarDesc(this)"></td>
+                <td class="row-desc">Seleccione un código...</td>
+                <td><button class="btn-del" onclick="this.parentElement.parentElement.remove()"><span class="material-icons-round">delete</span></button></td>
+            `;
+            tbody.appendChild(tr);
         }
 
-        function actualizarTabla() {
-            const tbody = document.getElementById('tablaCuerpo');
-            tbody.innerHTML = '';
-            let acumSubtotal = 0;
+        // 3. ACTUALIZAR DESCRIPCIÓN AUTOMÁTICAMENTE
+        function actualizarDesc(input) {
+            const row = input.parentElement.parentElement;
+            const descTd = row.querySelector('.row-desc');
+            const codigo = input.value;
+            
+            if (catalogo[codigo]) {
+                descTd.textContent = catalogo[codigo];
+                descTd.style.color = "#22c55e"; // Verde si existe
+            } else {
+                descTd.textContent = "No encontrado";
+                descTd.style.color = "#94a3b8";
+            }
+        }
 
-            listaCotizacion.forEach((p, i) => {
-                acumSubtotal += p.total;
-                tbody.innerHTML += `
-                    <tr>
-                        <td style="text-align:center; font-weight:800">${p.cant}</td>
-                        <td><b style="color:var(--primary)">${p.codigo}</b><br><small style="color:#64748b">${p.desc}</small></td>
-                        <td style="text-align:right">${formatoPesos(p.unitario)}</td>
-                        <td style="text-align:right; font-weight:800">${formatoPesos(p.total)}</td>
-                        <td class="no-print">
-                            <button onclick="eliminar(${i})" style="background:none; border:none; color:#ef4444; cursor:pointer">
-                                <i class="material-icons-round" style="font-size:18px">cancel</i>
-                            </button>
-                        </td>
-                    </tr>
+        // 4. PREPARAR PDF Y CAMBIAR NOMBRE
+        function prepararPDF() {
+            const filas = document.querySelectorAll('#tabla-cuerpo tr');
+            const pdfTbody = document.getElementById('pdf-tabla-cuerpo');
+            const nombreCliente = document.getElementById('cliente-nombre').value || "Cotizacion_Sin_Nombre";
+            
+            if (filas.length === 0) {
+                alert("Agrega al menos un material.");
+                return;
+            }
+
+            // Limpiar tabla PDF
+            pdfTbody.innerHTML = "";
+
+            // Copiar datos a la tabla de impresión
+            filas.forEach(fila => {
+                const qty = fila.querySelector('.row-qty').value;
+                const unit = fila.querySelector('.row-unit').value;
+                const code = fila.querySelector('.row-code').value;
+                const desc = fila.querySelector('.row-desc').textContent;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="text-align:center; font-weight:700">${qty}</td>
+                    <td>${unit}</td>
+                    <td style="font-weight:700">${code}</td>
+                    <td>${desc}</td>
                 `;
+                pdfTbody.appendChild(tr);
             });
 
-            const iva = acumSubtotal * 0.16;
-            document.getElementById('resSub').textContent = formatoPesos(acumSubtotal);
-            document.getElementById('resIva').textContent = formatoPesos(iva);
-            document.getElementById('resTotal').textContent = formatoPesos(acumSubtotal + iva);
+            // Cambiar el título del documento (esto será el nombre del archivo al guardar PDF)
+            const fecha = new Date().toISOString().slice(0,10);
+            document.title = `COTIZACION - ${nombreCliente.toUpperCase()} - ${fecha}`;
+
+            // Lanzar impresión
+            window.print();
         }
 
-        document.getElementById('outFecha').textContent = new Date().toLocaleDateString('es-MX', { day:'2-digit', month:'long', year:'numeric' });
+        // Inicializar
         cargarCSV();
+        agregarFila(); // Empezar con una fila vacía
     </script>
 </body>
 </html>
