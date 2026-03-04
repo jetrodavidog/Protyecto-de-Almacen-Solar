@@ -18,7 +18,7 @@
             --bg-dark: #0f172a;
             --glass: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --text-main: #f8fafc; /* Color blanco restaurado */
+            --text-main: #f8fafc;
             --text-muted: #94a3b8;
         }
 
@@ -102,54 +102,25 @@
         }
 
         header { text-align: center; margin-bottom: 50px; }
-        header h1 { 
-            font-family: 'Outfit'; font-size: 48px; margin: 0; 
-            letter-spacing: -1px; text-transform: uppercase;
-            color: #fff;
-        }
+        header h1 { font-family: 'Outfit'; font-size: 48px; margin: 0; letter-spacing: -1px; text-transform: uppercase; color: #fff; }
         header p { color: var(--primary); font-weight: 600; letter-spacing: 4px; margin-top: 5px; }
 
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px; margin-bottom: 40px;
-        }
-        .stat-card {
-            background: var(--glass); border: 1px solid var(--glass-border);
-            padding: 25px; border-radius: 24px; backdrop-filter: blur(10px);
-            display: flex; align-items: center; gap: 20px;
-        }
-        .stat-icon {
-            width: 60px; height: 60px; border-radius: 18px;
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(255, 152, 0, 0.1); color: var(--primary);
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .stat-card { background: var(--glass); border: 1px solid var(--glass-border); padding: 25px; border-radius: 24px; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 20px; }
+        .stat-icon { width: 60px; height: 60px; border-radius: 18px; display: flex; align-items: center; justify-content: center; background: rgba(255, 152, 0, 0.1); color: var(--primary); }
         .stat-info h3 { margin: 0; font-size: 13px; color: var(--text-muted); text-transform: uppercase; }
         .stat-info p { margin: 5px 0 0; font-size: 28px; font-weight: 800; font-family: 'Outfit'; color: #fff; }
 
-        .glass-panel {
-            background: var(--glass); border: 1px solid var(--glass-border);
-            border-radius: 30px; padding: 35px; backdrop-filter: blur(15px);
-            margin-bottom: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-        }
+        .glass-panel { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 30px; padding: 35px; backdrop-filter: blur(15px); margin-bottom: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
         .panel-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
         .panel-header i { color: var(--primary); }
         .panel-header h2 { font-size: 20px; margin: 0; font-family: 'Outfit'; color: #fff; }
 
-        .form-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 15px; align-items: end;
-        }
-        
-        input, select {
-            background: rgba(15, 23, 42, 0.6); border: 1px solid var(--glass-border);
-            padding: 14px 18px; border-radius: 14px; color: #fff; outline: none; width: 100%;
-        }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; align-items: end; }
+        input, select { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--glass-border); padding: 14px 18px; border-radius: 14px; color: #fff; outline: none; width: 100%; }
         input:focus { border-color: var(--primary); background: rgba(15, 23, 42, 0.9); }
 
-        .btn-primary {
-            background: var(--primary); color: #000; border: none; padding: 15px;
-            border-radius: 14px; font-weight: 800; cursor: pointer; text-transform: uppercase;
-        }
+        .btn-primary { background: var(--primary); color: #000; border: none; padding: 15px; border-radius: 14px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
         .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
 
         .table-container { margin-top: 20px; overflow-x: auto; }
@@ -263,4 +234,181 @@
                             <th style="text-align:center">Estado</th>
                         </tr>
                     </thead>
-                    <tbody id="tabla
+                    <tbody id="tablaStock"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://pfmgmyjvoptupfzsnhpp.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmbWdteWp2b3B0dXBmenNuaHBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NjQzOTEsImV4cCI6MjA4ODI0MDM5MX0.X5-_FlmabimTFm-Lc7n4moXg93ImEDO8dMvQuOE4f_c';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        let materiales = {}; 
+        let movimientos = []; 
+        let stockLocal = {};
+        const STOCK_MINIMO = 5;
+        const STAFF = ['Almacen', 'Cristóbal Arias','Fernando Valencia','Luis Garcia','Diego Bermejo','Soporte Tecnico'];
+
+        async function inicializar() {
+            try {
+                // 1. CARGAR CSV (Lógica original recuperada)
+                const r = await fetch('materiales_convertidos.csv');
+                const t = await r.text();
+                t.split(/\r?\n/).slice(1).forEach(line => {
+                    const c = line.split(',');
+                    if(c[0]) {
+                        let sku = c[0].trim();
+                        materiales[sku] = { 
+                            codigo: sku, 
+                            cat: c[1] ? c[1].trim() : 'GENERAL', 
+                            desc: c.slice(4).join(',').replace(/"/g, '').trim().toUpperCase(),
+                            cantidadFisica: 0
+                        };
+                    }
+                });
+
+                // 2. CARGAR DESDE SUPABASE (Persistencia real)
+                const { data: dbMats, error: err1 } = await supabase.from('materiales').select('*');
+                if(dbMats) {
+                    dbMats.forEach(m => {
+                        if(!materiales[m.CODIGO]) {
+                            materiales[m.CODIGO] = { codigo: m.CODIGO, cat: m.CATEGORIA, desc: m.DESCRIPCION, cantidadFisica: m.CANTIDAD };
+                        } else {
+                            materiales[m.CODIGO].cantidadFisica = parseFloat(m.CANTIDAD || 0);
+                        }
+                    });
+                }
+
+                // 3. CARGAR MOVIMIENTOS
+                const { data: dbMovs, error: err2 } = await supabase.from('movimientos').select('*');
+                if(dbMovs) movimientos = dbMovs;
+
+                poblarDatalist();
+                actualizarTodo();
+            } catch(e) { console.error("Error inicializando:", e); }
+        }
+
+        function poblarDatalist() {
+            const list = document.getElementById('listaCodigos');
+            list.innerHTML = "";
+            Object.values(materiales).forEach(m => {
+                const opt = document.createElement('option');
+                opt.value = m.codigo;
+                opt.label = m.desc;
+                list.appendChild(opt);
+            });
+        }
+
+        function poblarCombos() {
+            const obraSel = document.getElementById('inputObra');
+            const respSel = document.getElementById('inputResp');
+            obraSel.innerHTML = '<option value="">Seleccionar Proyecto</option>';
+            const obrasSet = new Set(movimientos.map(m => m.obra).filter(o => o && !o.startsWith('FACTURA:')));
+            obrasSet.forEach(o => obraSel.innerHTML += `<option value="${o}">${o}</option>`);
+            obraSel.innerHTML += '<option value="__new__">➕ AGREGAR NUEVO...</option>';
+
+            obraSel.onchange = () => {
+                respSel.innerHTML = '<option value="">Responsable...</option>';
+                if(obraSel.value === '__new__') {
+                    const nombre = prompt("Nombre de la Obra/Cliente:");
+                    if(nombre) {
+                        const val = nombre.toUpperCase().trim();
+                        obraSel.innerHTML += `<option value="${val}" selected>${val}</option>`;
+                        STAFF.forEach(s => respSel.innerHTML += `<option>${s}</option>`);
+                    }
+                } else { STAFF.forEach(s => respSel.innerHTML += `<option>${s}</option>`); }
+            };
+        }
+
+        async function registrarMovimiento() {
+            const sku = document.getElementById('inputCod').value.trim();
+            const tipo = document.getElementById('inputTipo').value;
+            const cant = parseFloat(document.getElementById('inputCant').value);
+            const obra = document.getElementById('inputObra').value;
+            const resp = document.getElementById('inputResp').value;
+
+            if(!materiales[sku]) return alert("SKU inexistente");
+            if(!cant || cant <= 0) return alert("Cantidad inválida");
+            if(!obra || !resp) return alert("Complete campos");
+
+            let stockActual = materiales[sku].cantidadFisica;
+            if(tipo === 'Salida' && stockActual < cant) return alert(`Stock insuficiente (${stockActual})`);
+
+            let nuevoStock = tipo === 'Entrada' ? stockActual + cant : stockActual - cant;
+
+            // Guardar en Supabase
+            const { error: err1 } = await supabase.from('movimientos').insert([{
+                codigo: sku, descripcion: materiales[sku].desc, cantidad: cant, tipo: tipo, obra: obra, responsable: resp, fecha: new Date().toISOString().split('T')[0]
+            }]);
+            
+            const { error: err2 } = await supabase.from('materiales').upsert({
+                CODIGO: sku, DESCRIPCION: materiales[sku].desc, CATEGORIA: materiales[sku].cat, CANTIDAD: nuevoStock
+            });
+
+            if(!err1 && !err2) {
+                materiales[sku].cantidadFisica = nuevoStock;
+                movimientos.push({ codigo: sku, tipo: tipo, cantidad: cant, fecha: new Date().toISOString().split('T')[0], obra: obra });
+                document.getElementById('inputCod').value = '';
+                document.getElementById('inputCant').value = '';
+                actualizarTodo();
+                alert("✅ Registrado con éxito");
+            } else { alert("Error de conexión"); }
+        }
+
+        function actualizarTodo() {
+            renderTabla();
+            poblarCombos();
+            actualizarDashboard();
+        }
+
+        function actualizarDashboard() {
+            document.getElementById('countSKU').textContent = Object.keys(materiales).length;
+            const hoy = new Date().toISOString().split('T')[0];
+            let ent = 0, sal = 0, bajo = 0;
+            movimientos.forEach(m => {
+                if(m.fecha === hoy) {
+                    if(m.tipo === 'Entrada') ent += parseFloat(m.cantidad);
+                    else sal += parseFloat(m.cantidad);
+                }
+            });
+            Object.values(materiales).forEach(m => { if(m.cantidadFisica < STOCK_MINIMO) bajo++; });
+            document.getElementById('countEntradas').textContent = ent.toFixed(0);
+            document.getElementById('countSalidas').textContent = sal.toFixed(0);
+            document.getElementById('countBajo').textContent = bajo;
+        }
+
+        function renderTabla() {
+            const body = document.getElementById('tablaStock');
+            body.innerHTML = '';
+            Object.values(materiales).sort((a,b) => a.codigo.localeCompare(b.codigo)).forEach(m => {
+                const s = m.cantidadFisica;
+                const esBajo = s < STOCK_MINIMO;
+                body.innerHTML += `
+                    <tr>
+                        <td style="font-weight:800; color:var(--primary)">${m.codigo}</td>
+                        <td style="color:white; font-weight:500">${m.desc}</td>
+                        <td style="color:var(--text-muted)">${m.cat}</td>
+                        <td style="text-align:center; font-weight:800; font-size:16px">${s}</td>
+                        <td style="text-align:center"><span class="badge ${esBajo ? 'badge-warn' : 'badge-safe'}">${esBajo ? 'REABASTECER' : 'OK'}</span></td>
+                    </tr>`;
+            });
+        }
+
+        document.getElementById('buscador').oninput = (e) => {
+            const val = e.target.value.toLowerCase();
+            Array.from(document.getElementById('tablaStock').rows).forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none';
+            });
+        };
+
+        inicializar();
+    </script>
+</body>
+</html>
