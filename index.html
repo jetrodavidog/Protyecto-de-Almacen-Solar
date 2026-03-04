@@ -34,108 +34,37 @@
             min-height: 100vh;
         }
 
-        .sidebar { 
-            position: fixed; 
-            left: -280px; 
-            width: 280px; 
-            height: 100%; 
-            background: #0b1224; 
-            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
-            z-index: 2000; 
-            box-shadow: 15px 0 40px rgba(0,0,0,0.7); 
-            border-right: 1px solid rgba(255,152,0,0.1); 
-        }
+        .sidebar { position: fixed; left: -280px; width: 280px; height: 100%; background: #0b1224; transition: 0.5s; z-index: 2000; box-shadow: 15px 0 40px rgba(0,0,0,0.7); border-right: 1px solid rgba(255,152,0,0.1); }
         .sidebar.active { left: 0; }
-        .sidebar-header { 
-            padding: 40px 25px; 
-            font-weight: 900; 
-            font-size: 24px; 
-            color: var(--primary); 
-            letter-spacing: -1px; 
-            font-family: 'Outfit', sans-serif;
-        }
-        .sidebar nav a { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            color: #94a3b8; 
-            text-decoration: none; 
-            padding: 18px 25px; 
-            transition: 0.3s; 
-            font-family: 'Outfit', sans-serif;
-        }
-        .sidebar nav a:hover, .sidebar nav a.active { 
-            background: rgba(255,152,0,0.1); 
-            color: white; 
-            border-left: 4px solid var(--primary); 
-        }
+        .sidebar-header { padding: 40px 25px; font-weight: 900; font-size: 24px; color: var(--primary); font-family: 'Outfit'; }
+        .sidebar nav a { display: flex; align-items: center; gap: 15px; color: #94a3b8; text-decoration: none; padding: 18px 25px; font-family: 'Outfit'; }
+        .sidebar nav a.active { background: rgba(255,152,0,0.1); color: white; border-left: 4px solid var(--primary); }
 
-        .menu-btn { 
-            position: fixed; 
-            top: 20px; 
-            left: 20px; 
-            background: var(--primary); 
-            border: none; 
-            border-radius: 15px; 
-            padding: 14px; 
-            cursor: pointer; 
-            z-index: 1500; 
-            color: white; 
-            box-shadow: 0 8px 20px rgba(255,152,0,0.3); 
-            display: flex;
-        }
-
-        .overlay { 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.75); 
-            backdrop-filter: blur(5px); 
-            display: none; 
-            z-index: 1000; 
-        }
+        .menu-btn { position: fixed; top: 20px; left: 20px; background: var(--primary); border: none; border-radius: 15px; padding: 14px; cursor: pointer; z-index: 1500; color: white; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(5px); display: none; z-index: 1000; }
         .overlay.active { display: block; }
 
-        .main-content {
-            max-width: 1400px; 
-            margin: 0 auto; 
-            padding: 100px 20px 50px; 
-        }
-
+        .main-content { max-width: 1400px; margin: 0 auto; padding: 100px 20px 50px; }
         header { text-align: center; margin-bottom: 50px; }
-        header h1 { font-family: 'Outfit'; font-size: 48px; margin: 0; letter-spacing: -1px; text-transform: uppercase; color: #fff; }
-        header p { color: var(--primary); font-weight: 600; letter-spacing: 4px; margin-top: 5px; }
+        header h1 { font-family: 'Outfit'; font-size: 48px; margin: 0; text-transform: uppercase; color: #fff; }
 
         .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px; }
         .stat-card { background: var(--glass); border: 1px solid var(--glass-border); padding: 25px; border-radius: 24px; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 20px; }
-        .stat-icon { width: 60px; height: 60px; border-radius: 18px; display: flex; align-items: center; justify-content: center; background: rgba(255, 152, 0, 0.1); color: var(--primary); }
-        .stat-info h3 { margin: 0; font-size: 13px; color: var(--text-muted); text-transform: uppercase; }
-        .stat-info p { margin: 5px 0 0; font-size: 28px; font-weight: 800; font-family: 'Outfit'; color: #fff; }
+        .stat-info p { margin: 5px 0 0; font-size: 28px; font-weight: 800; color: #fff; }
 
-        .glass-panel { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 30px; padding: 35px; backdrop-filter: blur(15px); margin-bottom: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
-        .panel-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
-        .panel-header i { color: var(--primary); }
-        .panel-header h2 { font-size: 20px; margin: 0; font-family: 'Outfit'; color: #fff; }
-
+        .glass-panel { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 30px; padding: 35px; backdrop-filter: blur(15px); margin-bottom: 30px; }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; align-items: end; }
+        
         input, select { background: rgba(15, 23, 42, 0.6); border: 1px solid var(--glass-border); padding: 14px 18px; border-radius: 14px; color: #fff; outline: none; width: 100%; }
-        input:focus { border-color: var(--primary); background: rgba(15, 23, 42, 0.9); }
+        .btn-primary { background: var(--primary); color: #000; border: none; padding: 15px; border-radius: 14px; font-weight: 800; cursor: pointer; width: 100%; }
 
-        .btn-primary { background: var(--primary); color: #000; border: none; padding: 15px; border-radius: 14px; font-weight: 800; cursor: pointer; text-transform: uppercase; }
-        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
-
-        .table-container { margin-top: 20px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; color: #fff; }
-        th { text-align: left; padding: 18px; color: var(--text-muted); font-size: 12px; text-transform: uppercase; border-bottom: 1px solid var(--glass-border); }
-        td { padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 14px; color: #f8fafc; }
-        tr:hover { background: rgba(255,255,255,0.02); }
-
+        table { width: 100%; border-collapse: collapse; color: #fff; }
+        th { text-align: left; padding: 18px; color: var(--text-muted); border-bottom: 1px solid var(--glass-border); font-size: 12px; }
+        td { padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 14px; }
+        
         .badge { padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; }
         .badge-safe { background: rgba(0, 229, 255, 0.1); color: var(--accent); }
         .badge-warn { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
-
-        .search-bar { position: relative; max-width: 400px; margin-bottom: 20px; }
-        .search-bar i { position: absolute; left: 15px; top: 12px; color: var(--text-muted); }
-        .search-bar input { padding-left: 45px; }
     </style>
 </head>
 <body>
@@ -179,58 +108,48 @@
         </div>
 
         <div class="glass-panel">
-            <div class="panel-header">
-                <i class="material-icons-round">add_box</i>
-                <h2>Registrar Nuevo Movimiento</h2>
-            </div>
+            <div class="panel-header"><h2>Registrar Nuevo Movimiento</h2></div>
             <div class="form-grid">
                 <div>
-                    <label style="font-size: 11px; color:var(--text-muted); display:block; margin-bottom:5px">Código o SKU</label>
-                    <input id="inputCod" list="listaCodigos" placeholder="Buscar material...">
+                    <label>Código o SKU</label>
+                    <input id="inputCod" list="listaCodigos" placeholder="Escribe para buscar...">
                     <datalist id="listaCodigos"></datalist>
                 </div>
                 <div>
-                    <label style="font-size: 11px; color:var(--text-muted); display:block; margin-bottom:5px">Tipo</label>
+                    <label>Tipo</label>
                     <select id="inputTipo">
-                        <option value="Entrada">📥 Entrada a Stock</option>
-                        <option value="Salida">📤 Salida a Obra</option>
+                        <option value="Entrada">📥 Entrada</option>
+                        <option value="Salida">📤 Salida</option>
                     </select>
                 </div>
                 <div>
-                    <label style="font-size: 11px; color:var(--text-muted); display:block; margin-bottom:5px">Cantidad</label>
+                    <label>Cantidad</label>
                     <input id="inputCant" type="number" placeholder="0.00">
                 </div>
                 <div>
-                    <label style="font-size: 11px; color:var(--text-muted); display:block; margin-bottom:5px">Destino / Obra</label>
+                    <label>Destino / Obra</label>
                     <select id="inputObra"></select>
                 </div>
                 <div>
-                    <label style="font-size: 11px; color:var(--text-muted); display:block; margin-bottom:5px">Responsable</label>
+                    <label>Responsable</label>
                     <select id="inputResp"></select>
                 </div>
-                <button class="btn-primary" onclick="registrarMovimiento()">Confirmar</button>
+                <button class="btn-primary" onclick="registrarMovimiento()">Confirmar Registro</button>
             </div>
         </div>
 
         <div class="glass-panel">
-            <div class="panel-header">
-                <i class="material-icons-round">storage</i>
-                <h2>Estado de Stock en Tiempo Real</h2>
+            <div class="search-bar" style="margin-bottom:20px;">
+                <input id="buscador" placeholder="Buscar en tabla...">
             </div>
-            
-            <div class="search-bar">
-                <i class="material-icons-round">search</i>
-                <input id="buscador" placeholder="Filtrar por código, descripción o categoría...">
-            </div>
-
             <div class="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th>Código / SKU</th>
-                            <th>Descripción Detallada</th>
+                            <th>Código</th>
+                            <th>Descripción</th>
                             <th>Categoría</th>
-                            <th style="text-align:center">Stock Actual</th>
+                            <th style="text-align:center">Stock</th>
                             <th style="text-align:center">Estado</th>
                         </tr>
                     </thead>
@@ -245,54 +164,52 @@
         const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBmbWdteWp2b3B0dXBmenNuaHBwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NjQzOTEsImV4cCI6MjA4ODI0MDM5MX0.X5-_FlmabimTFm-Lc7n4moXg93ImEDO8dMvQuOE4f_c';
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+        let materiales = {}; 
+        let movimientos = []; 
+        const STOCK_CRITICO = 20; // Ajustado a tu solicitud
+        const STAFF = ['Almacen', 'Cristóbal Arias','Fernando Valencia','Luis Garcia','Diego Bermejo','Soporte Tecnico'];
+
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('overlay').classList.toggle('active');
         }
 
-        let materiales = {}; 
-        let movimientos = []; 
-        let stockLocal = {};
-        const STOCK_MINIMO = 5;
-        const STAFF = ['Almacen', 'Cristóbal Arias','Fernando Valencia','Luis Garcia','Diego Bermejo','Soporte Tecnico'];
-
         async function inicializar() {
             try {
-                // 1. CARGAR CSV (Lógica original recuperada)
-                const r = await fetch('materiales_convertidos.csv');
-                const t = await r.text();
-                t.split(/\r?\n/).slice(1).forEach(line => {
-                    const c = line.split(',');
+                // 1. Cargar CSV original para el catálogo y Datalist
+                const respCsv = await fetch('materiales_convertidos.csv');
+                const textoCsv = await respCsv.text();
+                textoCsv.split(/\r?\n/).slice(1).forEach(linea => {
+                    const c = linea.split(',');
                     if(c[0]) {
-                        let sku = c[0].trim();
-                        materiales[sku] = { 
-                            codigo: sku, 
-                            cat: c[1] ? c[1].trim() : 'GENERAL', 
+                        const sku = c[0].trim();
+                        materiales[sku] = {
+                            codigo: sku,
+                            cat: c[1] ? c[1].trim() : 'GENERAL',
                             desc: c.slice(4).join(',').replace(/"/g, '').trim().toUpperCase(),
                             cantidadFisica: 0
                         };
                     }
                 });
 
-                // 2. CARGAR DESDE SUPABASE (Persistencia real)
-                const { data: dbMats, error: err1 } = await supabase.from('materiales').select('*');
+                // 2. Sincronizar cantidades desde Supabase
+                const { data: dbMats } = await supabase.from('materiales').select('*');
                 if(dbMats) {
                     dbMats.forEach(m => {
-                        if(!materiales[m.CODIGO]) {
-                            materiales[m.CODIGO] = { codigo: m.CODIGO, cat: m.CATEGORIA, desc: m.DESCRIPCION, cantidadFisica: m.CANTIDAD };
-                        } else {
+                        if(materiales[m.CODIGO]) {
                             materiales[m.CODIGO].cantidadFisica = parseFloat(m.CANTIDAD || 0);
                         }
                     });
                 }
 
-                // 3. CARGAR MOVIMIENTOS
-                const { data: dbMovs, error: err2 } = await supabase.from('movimientos').select('*');
+                // 3. Cargar Movimientos para el Dashboard
+                const { data: dbMovs } = await supabase.from('movimientos').select('*');
                 if(dbMovs) movimientos = dbMovs;
 
                 poblarDatalist();
+                poblarCombos();
                 actualizarTodo();
-            } catch(e) { console.error("Error inicializando:", e); }
+            } catch(e) { console.error("Error al iniciar:", e); }
         }
 
         function poblarDatalist() {
@@ -309,21 +226,25 @@
         function poblarCombos() {
             const obraSel = document.getElementById('inputObra');
             const respSel = document.getElementById('inputResp');
+            
+            // Lógica original de Obra
             obraSel.innerHTML = '<option value="">Seleccionar Proyecto</option>';
             const obrasSet = new Set(movimientos.map(m => m.obra).filter(o => o && !o.startsWith('FACTURA:')));
             obrasSet.forEach(o => obraSel.innerHTML += `<option value="${o}">${o}</option>`);
             obraSel.innerHTML += '<option value="__new__">➕ AGREGAR NUEVO...</option>';
 
+            // Lógica original de Responsables
+            respSel.innerHTML = '<option value="">Responsable...</option>';
+            STAFF.forEach(s => respSel.innerHTML += `<option value="${s}">${s}</option>`);
+
             obraSel.onchange = () => {
-                respSel.innerHTML = '<option value="">Responsable...</option>';
                 if(obraSel.value === '__new__') {
                     const nombre = prompt("Nombre de la Obra/Cliente:");
                     if(nombre) {
                         const val = nombre.toUpperCase().trim();
                         obraSel.innerHTML += `<option value="${val}" selected>${val}</option>`;
-                        STAFF.forEach(s => respSel.innerHTML += `<option>${s}</option>`);
                     }
-                } else { STAFF.forEach(s => respSel.innerHTML += `<option>${s}</option>`); }
+                }
             };
         }
 
@@ -334,37 +255,41 @@
             const obra = document.getElementById('inputObra').value;
             const resp = document.getElementById('inputResp').value;
 
-            if(!materiales[sku]) return alert("SKU inexistente");
-            if(!cant || cant <= 0) return alert("Cantidad inválida");
-            if(!obra || !resp) return alert("Complete campos");
+            if(!materiales[sku]) return alert("El material no existe en el catálogo.");
+            if(!cant || cant <= 0) return alert("Ingresa una cantidad válida.");
+            if(!obra || !resp) return alert("Selecciona obra y responsable.");
 
             let stockActual = materiales[sku].cantidadFisica;
-            if(tipo === 'Salida' && stockActual < cant) return alert(`Stock insuficiente (${stockActual})`);
+            if(tipo === 'Salida' && stockActual < cant) return alert("¡Error! Stock insuficiente.");
 
             let nuevoStock = tipo === 'Entrada' ? stockActual + cant : stockActual - cant;
 
-            // Guardar en Supabase
-            const { error: err1 } = await supabase.from('movimientos').insert([{
+            // Registro en Supabase
+            const { error: errMov } = await supabase.from('movimientos').insert([{
                 codigo: sku, descripcion: materiales[sku].desc, cantidad: cant, tipo: tipo, obra: obra, responsable: resp, fecha: new Date().toISOString().split('T')[0]
             }]);
-            
-            const { error: err2 } = await supabase.from('materiales').upsert({
+
+            const { error: errMat } = await supabase.from('materiales').upsert({
                 CODIGO: sku, DESCRIPCION: materiales[sku].desc, CATEGORIA: materiales[sku].cat, CANTIDAD: nuevoStock
             });
 
-            if(!err1 && !err2) {
+            if(!errMov && !errMat) {
                 materiales[sku].cantidadFisica = nuevoStock;
-                movimientos.push({ codigo: sku, tipo: tipo, cantidad: cant, fecha: new Date().toISOString().split('T')[0], obra: obra });
+                movimientos.push({ codigo: sku, tipo: tipo, cantidad: cant, fecha: new Date().toISOString().split('T')[0] });
+                
+                // Limpiar campos
                 document.getElementById('inputCod').value = '';
                 document.getElementById('inputCant').value = '';
+                
                 actualizarTodo();
-                alert("✅ Registrado con éxito");
-            } else { alert("Error de conexión"); }
+                alert("✅ Registro exitoso y stock actualizado.");
+            } else {
+                alert("Error al conectar con la base de datos.");
+            }
         }
 
         function actualizarTodo() {
             renderTabla();
-            poblarCombos();
             actualizarDashboard();
         }
 
@@ -372,31 +297,42 @@
             document.getElementById('countSKU').textContent = Object.keys(materiales).length;
             const hoy = new Date().toISOString().split('T')[0];
             let ent = 0, sal = 0, bajo = 0;
+
             movimientos.forEach(m => {
                 if(m.fecha === hoy) {
                     if(m.tipo === 'Entrada') ent += parseFloat(m.cantidad);
                     else sal += parseFloat(m.cantidad);
                 }
             });
-            Object.values(materiales).forEach(m => { if(m.cantidadFisica < STOCK_MINIMO) bajo++; });
+
+            Object.values(materiales).forEach(m => {
+                if(m.cantidadFisica < STOCK_CRITICO) bajo++;
+            });
+
             document.getElementById('countEntradas').textContent = ent.toFixed(0);
             document.getElementById('countSalidas').textContent = sal.toFixed(0);
             document.getElementById('countBajo').textContent = bajo;
         }
 
         function renderTabla() {
-            const body = document.getElementById('tablaStock');
-            body.innerHTML = '';
+            const tbody = document.getElementById('tablaStock');
+            tbody.innerHTML = '';
+            
             Object.values(materiales).sort((a,b) => a.codigo.localeCompare(b.codigo)).forEach(m => {
-                const s = m.cantidadFisica;
-                const esBajo = s < STOCK_MINIMO;
-                body.innerHTML += `
+                const stock = m.cantidadFisica;
+                const esBajo = stock < STOCK_CRITICO;
+                
+                tbody.innerHTML += `
                     <tr>
-                        <td style="font-weight:800; color:var(--primary)">${m.codigo}</td>
-                        <td style="color:white; font-weight:500">${m.desc}</td>
+                        <td style="color:var(--primary); font-weight:800">${m.codigo}</td>
+                        <td style="color:white">${m.desc}</td>
                         <td style="color:var(--text-muted)">${m.cat}</td>
-                        <td style="text-align:center; font-weight:800; font-size:16px">${s}</td>
-                        <td style="text-align:center"><span class="badge ${esBajo ? 'badge-warn' : 'badge-safe'}">${esBajo ? 'REABASTECER' : 'OK'}</span></td>
+                        <td style="text-align:center; font-weight:800">${stock}</td>
+                        <td style="text-align:center">
+                            <span class="badge ${esBajo ? 'badge-warn' : 'badge-safe'}">
+                                ${esBajo ? 'STOCK CRÍTICO' : 'STOCK NORMAL'}
+                            </span>
+                        </td>
                     </tr>`;
             });
         }
