@@ -18,7 +18,7 @@
             --bg-dark: #0f172a;
             --glass: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --text-main: #000000; /* Ajuste de visibilidad aplicado */
+            --text-main: #f8fafc; /* Color blanco restaurado */
             --text-muted: #94a3b8;
         }
 
@@ -34,9 +34,6 @@
             min-height: 100vh;
         }
 
-        /* =========================================
-           CORRECCIÓN: SIDEBAR COMPLETO (CÓDIGO 1)
-        ========================================= */
         .sidebar { 
             position: fixed; 
             left: -280px; 
@@ -98,9 +95,6 @@
         }
         .overlay.active { display: block; }
 
-        /* =========================================
-           RESTO DEL CÓDIGO SIN TOCAR LÓGICA
-        ========================================= */
         .main-content {
             max-width: 1400px; 
             margin: 0 auto; 
@@ -111,6 +105,7 @@
         header h1 { 
             font-family: 'Outfit'; font-size: 48px; margin: 0; 
             letter-spacing: -1px; text-transform: uppercase;
+            color: #fff;
         }
         header p { color: var(--primary); font-weight: 600; letter-spacing: 4px; margin-top: 5px; }
 
@@ -129,7 +124,7 @@
             background: rgba(255, 152, 0, 0.1); color: var(--primary);
         }
         .stat-info h3 { margin: 0; font-size: 13px; color: var(--text-muted); text-transform: uppercase; }
-        .stat-info p { margin: 5px 0 0; font-size: 28px; font-weight: 800; font-family: 'Outfit'; }
+        .stat-info p { margin: 5px 0 0; font-size: 28px; font-weight: 800; font-family: 'Outfit'; color: #fff; }
 
         .glass-panel {
             background: var(--glass); border: 1px solid var(--glass-border);
@@ -138,7 +133,7 @@
         }
         .panel-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
         .panel-header i { color: var(--primary); }
-        .panel-header h2 { font-size: 20px; margin: 0; font-family: 'Outfit'; }
+        .panel-header h2 { font-size: 20px; margin: 0; font-family: 'Outfit'; color: #fff; }
 
         .form-grid {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -158,9 +153,9 @@
         .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); }
 
         .table-container { margin-top: 20px; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; color: #fff; }
         th { text-align: left; padding: 18px; color: var(--text-muted); font-size: 12px; text-transform: uppercase; border-bottom: 1px solid var(--glass-border); }
-        td { padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 14px; }
+        td { padding: 18px; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 14px; color: #f8fafc; }
         tr:hover { background: rgba(255,255,255,0.02); }
 
         .badge { padding: 6px 12px; border-radius: 8px; font-weight: 700; font-size: 11px; }
@@ -268,209 +263,4 @@
                             <th style="text-align:center">Estado</th>
                         </tr>
                     </thead>
-                    <tbody id="tablaStock"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // CONFIGURACIÓN DE SUPABASE (Reemplaza con tus datos)
-        const supabaseUrl = 'TU_URL_DE_SUPABASE';
-        const supabaseKey = 'TU_ANON_KEY_DE_SUPABASE';
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
-        // FUNCIÓN DEL SIDEBAR ORIGINAL
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
-            document.getElementById('overlay').classList.toggle('active');
-        }
-
-        // VARIABLES GLOBALES
-        let materiales = {}; 
-        let movimientos = []; 
-        let stock = {};
-        const STOCK_MINIMO = 5;
-        const STAFF = ['Almacen', 'Cristóbal Arias','Fernando Valencia','Luis Garcia','Diego Bermejo','Soporte Tecnico'];
-
-        async function inicializar() {
-            try {
-                // 1. OBTENER MATERIALES DE SUPABASE
-                const { data: dataMateriales, error: errMat } = await supabase
-                    .from('materiales')
-                    .select('*');
-                
-                if (errMat) {
-                    console.error("Error cargando materiales:", errMat);
-                } else if (dataMateriales) {
-                    dataMateriales.forEach(m => {
-                        materiales[m.CODIGO] = { 
-                            codigo: m.CODIGO, 
-                            cat: m.CATEGORIA || 'GENERAL', 
-                            desc: m.DESCRIPCION ? m.DESCRIPCION.toUpperCase() : ''
-                        };
-                    });
-                }
-
-                // 2. OBTENER MOVIMIENTOS DE SUPABASE (Reemplaza localStorage)
-                const { data: dataMovs, error: errMov } = await supabase
-                    .from('movimientos')
-                    .select('*');
-
-                if (errMov) {
-                    console.error("Error cargando movimientos:", errMov);
-                } else if (dataMovs) {
-                    movimientos = dataMovs;
-                }
-
-                poblarDatalist();
-                actualizarTodo();
-            } catch(e) { console.error("Error de inicialización:", e); }
-        }
-
-        function poblarDatalist() {
-            const list = document.getElementById('listaCodigos');
-            list.innerHTML = "";
-            Object.values(materiales).forEach(m => {
-                const opt = document.createElement('option');
-                opt.value = m.codigo;
-                opt.label = m.desc;
-                list.appendChild(opt);
-            });
-        }
-
-        function poblarCombos() {
-            const obraSel = document.getElementById('inputObra');
-            const respSel = document.getElementById('inputResp');
-            
-            obraSel.innerHTML = '<option value="">Seleccionar Proyecto</option>';
-            const obrasSet = new Set(movimientos.map(m => m.obra).filter(o => o && !o.startsWith('FACTURA:')));
-            obrasSet.forEach(o => obraSel.innerHTML += `<option value="${o}">${o}</option>`);
-            obraSel.innerHTML += '<option value="__new__">➕ AGREGAR NUEVO...</option>';
-
-            obraSel.onchange = () => {
-                respSel.innerHTML = '<option value="">Responsable...</option>';
-                if(obraSel.value === '__new__') {
-                    const nombre = prompt("Nombre de la Obra/Cliente:");
-                    if(nombre) {
-                        const val = nombre.toUpperCase().trim();
-                        obraSel.innerHTML += `<option value="${val}" selected>${val}</option>`;
-                        STAFF.forEach(s => respSel.innerHTML += `<option>${s}</option>`);
-                    }
-                } else {
-                    STAFF.forEach(s => respSel.innerHTML += `<option>${s}</option>`);
-                }
-            };
-        }
-
-        async function registrarMovimiento() {
-            const sku = document.getElementById('inputCod').value.trim();
-            const tipo = document.getElementById('inputTipo').value;
-            const cant = parseFloat(document.getElementById('inputCant').value);
-            const obra = document.getElementById('inputObra').value;
-            const resp = document.getElementById('inputResp').value;
-
-            if(!materiales[sku]) return alert("SKU inexistente");
-            if(!cant || cant <= 0) return alert("Cantidad inválida");
-            if(!obra || !resp) return alert("Complete destino y responsable");
-
-            if(tipo === 'Salida' && (stock[sku] || 0) < cant) {
-                return alert(`Stock insuficiente. Solo hay ${stock[sku] || 0} disponibles.`);
-            }
-
-            const nuevoMovimiento = {
-                codigo: sku,
-                descripcion: materiales[sku].desc,
-                cantidad: cant,
-                tipo: tipo,
-                obra: obra,
-                responsable: resp,
-                fecha: new Date().toISOString().split('T')[0],
-                timestamp: Date.now()
-            };
-
-            // 3. GUARDAR MOVIMIENTO EN SUPABASE
-            const { error } = await supabase
-                .from('movimientos')
-                .insert([nuevoMovimiento]);
-
-            if (error) {
-                console.error("Error al insertar movimiento:", error);
-                alert("Hubo un error al guardar en la base de datos.");
-                return;
-            }
-
-            // Actualizar arreglo local si se guardó con éxito
-            movimientos.push(nuevoMovimiento);
-            
-            document.getElementById('inputCod').value = '';
-            document.getElementById('inputCant').value = '';
-            actualizarTodo();
-            alert("✅ Movimiento registrado y sincronizado");
-        }
-
-        function actualizarTodo() {
-            stock = {};
-            movimientos.forEach(m => {
-                const c = parseFloat(m.cantidad) || 0;
-                stock[m.codigo] = (stock[m.codigo] || 0) + (m.tipo === 'Entrada' ? c : -c);
-            });
-            renderTabla();
-            poblarCombos();
-            actualizarDashboard();
-        }
-
-        function actualizarDashboard() {
-            document.getElementById('countSKU').textContent = Object.keys(materiales).length;
-            const hoy = new Date().toISOString().split('T')[0];
-            let ent = 0, sal = 0, bajo = 0;
-
-            movimientos.forEach(m => {
-                if(m.fecha === hoy) {
-                    if(m.tipo === 'Entrada') ent += parseFloat(m.cantidad);
-                    else sal += parseFloat(m.cantidad);
-                }
-            });
-
-            Object.values(materiales).forEach(m => {
-                if((stock[m.codigo] || 0) < STOCK_MINIMO) bajo++;
-            });
-
-            document.getElementById('countEntradas').textContent = ent.toFixed(0);
-            document.getElementById('countSalidas').textContent = sal.toFixed(0);
-            document.getElementById('countBajo').textContent = bajo;
-        }
-
-        function renderTabla() {
-            const body = document.getElementById('tablaStock');
-            body.innerHTML = '';
-            Object.values(materiales).sort((a,b) => a.codigo.localeCompare(b.codigo)).forEach(m => {
-                const s = stock[m.codigo] || 0;
-                const esBajo = s < STOCK_MINIMO;
-                body.innerHTML += `
-                    <tr>
-                        <td style="font-weight:800; color:var(--primary)">${m.codigo}</td>
-                        <td style="color:#000; font-weight:500">${m.desc}</td>
-                        <td style="color:var(--text-muted)">${m.cat}</td>
-                        <td style="text-align:center; font-weight:800; font-size:16px">${s}</td>
-                        <td style="text-align:center">
-                            <span class="badge ${esBajo ? 'badge-warn' : 'badge-safe'}">
-                                ${esBajo ? 'REABASTECER' : 'OK'}
-                            </span>
-                        </td>
-                    </tr>`;
-            });
-        }
-
-        document.getElementById('buscador').oninput = (e) => {
-            const val = e.target.value.toLowerCase();
-            Array.from(document.getElementById('tablaStock').rows).forEach(row => {
-                row.style.display = row.innerText.toLowerCase().includes(val) ? '' : 'none';
-            });
-        };
-
-        // INICIAR CONEXIÓN Y CARGA
-        inicializar();
-    </script>
-</body>
-</html>
+                    <tbody id="tabla
