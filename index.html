@@ -7,6 +7,8 @@
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
         :root {
@@ -16,7 +18,7 @@
             --bg-dark: #0f172a;
             --glass: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.1);
-            --text-main: #f8fafc;
+            --text-main: #000000; /* Ajuste de visibilidad aplicado */
             --text-muted: #94a3b8;
         }
 
@@ -102,7 +104,7 @@
         .main-content {
             max-width: 1400px; 
             margin: 0 auto; 
-            padding: 100px 20px 50px; /* Ajustado para que el botón no tape el título */
+            padding: 100px 20px 50px; 
         }
 
         header { text-align: center; margin-bottom: 50px; }
@@ -273,49 +275,57 @@
     </div>
 
     <script>
+        // CONFIGURACIÓN DE SUPABASE (Reemplaza con tus datos)
+        const supabaseUrl = 'TU_URL_DE_SUPABASE';
+        const supabaseKey = 'TU_ANON_KEY_DE_SUPABASE';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
         // FUNCIÓN DEL SIDEBAR ORIGINAL
         function toggleSidebar() {
             document.getElementById('sidebar').classList.toggle('active');
             document.getElementById('overlay').classList.toggle('active');
         }
 
-        // LÓGICA DE DATOS MANTENIDA
+        // VARIABLES GLOBALES
         let materiales = {}; 
-        let movimientos = JSON.parse(localStorage.getItem('movimientos') || '[]'); 
+        let movimientos = []; 
         let stock = {};
         const STOCK_MINIMO = 5;
         const STAFF = ['Almacen', 'Cristóbal Arias','Fernando Valencia','Luis Garcia','Diego Bermejo','Soporte Tecnico'];
 
         async function inicializar() {
             try {
-                const r = await fetch('materiales_convertidos.csv');
-                const t = await r.text();
-                t.split(/\r?\n/).slice(1).forEach(line => {
-                    const c = line.split(',');
-                    if(c[0]) {
-                        let sku = c[0].trim();
-                        materiales[sku] = { 
-                            codigo: sku, 
-                            cat: c[1] ? c[1].trim() : 'GENERAL', 
-                            desc: c.slice(4).join(',').replace(/"/g, '').trim().toUpperCase()
+                // 1. OBTENER MATERIALES DE SUPABASE
+                const { data: dataMateriales, error: errMat } = await supabase
+                    .from('materiales')
+                    .select('*');
+                
+                if (errMat) {
+                    console.error("Error cargando materiales:", errMat);
+                } else if (dataMateriales) {
+                    dataMateriales.forEach(m => {
+                        materiales[m.CODIGO] = { 
+                            codigo: m.CODIGO, 
+                            cat: m.CATEGORIA || 'GENERAL', 
+                            desc: m.DESCRIPCION ? m.DESCRIPCION.toUpperCase() : ''
                         };
-                    }
-                });
+                    });
+                }
 
-                const nuevos = JSON.parse(localStorage.getItem('productos_manuales') || '[]');
-                nuevos.forEach(n => {
-                    if(!materiales[n.sku]) {
-                        materiales[n.sku] = {
-                            codigo: n.sku,
-                            cat: n.categoria || 'NUEVO',
-                            desc: n.desc.toUpperCase()
-                        };
-                    }
-                });
+                // 2. OBTENER MOVIMIENTOS DE SUPABASE (Reemplaza localStorage)
+                const { data: dataMovs, error: errMov } = await supabase
+                    .from('movimientos')
+                    .select('*');
+
+                if (errMov) {
+                    console.error("Error cargando movimientos:", errMov);
+                } else if (dataMovs) {
+                    movimientos = dataMovs;
+                }
 
                 poblarDatalist();
                 actualizarTodo();
-            } catch(e) { console.error("Error de carga:", e); }
+            } catch(e) { console.error("Error de inicialización:", e); }
         }
 
         function poblarDatalist() {
@@ -353,7 +363,7 @@
             };
         }
 
-        function registrarMovimiento() {
+        async function registrarMovimiento() {
             const sku = document.getElementById('inputCod').value.trim();
             const tipo = document.getElementById('inputTipo').value;
             const cant = parseFloat(document.getElementById('inputCant').value);
@@ -368,7 +378,7 @@
                 return alert(`Stock insuficiente. Solo hay ${stock[sku] || 0} disponibles.`);
             }
 
-            movimientos.push({
+            const nuevoMovimiento = {
                 codigo: sku,
                 descripcion: materiales[sku].desc,
                 cantidad: cant,
@@ -377,13 +387,26 @@
                 responsable: resp,
                 fecha: new Date().toISOString().split('T')[0],
                 timestamp: Date.now()
-            });
+            };
 
-            localStorage.setItem('movimientos', JSON.stringify(movimientos));
+            // 3. GUARDAR MOVIMIENTO EN SUPABASE
+            const { error } = await supabase
+                .from('movimientos')
+                .insert([nuevoMovimiento]);
+
+            if (error) {
+                console.error("Error al insertar movimiento:", error);
+                alert("Hubo un error al guardar en la base de datos.");
+                return;
+            }
+
+            // Actualizar arreglo local si se guardó con éxito
+            movimientos.push(nuevoMovimiento);
+            
             document.getElementById('inputCod').value = '';
             document.getElementById('inputCant').value = '';
             actualizarTodo();
-            alert("✅ Movimiento registrado");
+            alert("✅ Movimiento registrado y sincronizado");
         }
 
         function actualizarTodo() {
@@ -427,7 +450,7 @@
                 body.innerHTML += `
                     <tr>
                         <td style="font-weight:800; color:var(--primary)">${m.codigo}</td>
-                        <td style="color:#fff; font-weight:500">${m.desc}</td>
+                        <td style="color:#000; font-weight:500">${m.desc}</td>
                         <td style="color:var(--text-muted)">${m.cat}</td>
                         <td style="text-align:center; font-weight:800; font-size:16px">${s}</td>
                         <td style="text-align:center">
@@ -446,6 +469,7 @@
             });
         };
 
+        // INICIAR CONEXIÓN Y CARGA
         inicializar();
     </script>
 </body>
